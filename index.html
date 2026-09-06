@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Surat NA Premium 2026</title>
     
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -33,9 +34,14 @@
         }
     </script>
     
+    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
@@ -75,6 +81,7 @@
                 margin: 0;
             }
             
+            /* Spasi dikompres maksimal untuk print */
             .mb-12 { margin-bottom: 0.5rem !important; }
             .mb-10 { margin-bottom: 0.4rem !important; }
             .mt-10 { margin-top: 0.4rem !important; }
@@ -86,53 +93,35 @@
             h2, h3 { margin-bottom: 0.15rem !important; }
             p.mb-4 { margin-bottom: 0.15rem !important; }
             
+            /* Mengurangi padding tabel secara global saat print */
             .form-table td, table td {
                 padding: 0px 2px !important;
                 line-height: 1.05 !important;
             }
             
+            /* Mematikan class 'py-1' (padding Y) pada tabel saat print */
             .py-1 {
                 padding-top: 0 !important;
                 padding-bottom: 0 !important;
             }
 
-            /* --- KOP SURAT PRINT ADJUSTMENTS & PERFECT ALIGNMENT --- */
+            /* --- KOP SURAT PRINT ADJUSTMENTS --- */
             .kop-surat {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                margin-bottom: 8px !important;
-                padding-top: 6px !important;
-                padding-bottom: 6px !important;
-                border-bottom: 2px solid black !important;
-            }
-            .kop-surat .print-logo-box {
-                width: 1.8cm !important;
-                height: 1.8cm !important;
-                flex-shrink: 0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }
-            .kop-surat .print-logo-box img {
-                max-width: 100% !important;
-                max-height: 100% !important;
-                object-fit: contain !important;
-            }
-            .kop-surat .print-title-box {
-                flex: 1 !important;
-                text-align: center !important;
-                padding: 0 4px !important;
-            }
-            .kop-surat .print-logo-spacer {
-                width: 1.8cm !important;
-                flex-shrink: 0 !important;
+                margin-bottom: 2px !important; /* Kurangi jarak bawah kop surat drastis */
+                padding-bottom: 2px !important; /* Kurangi padding bawah kop surat drastis */
+                border-bottom: 2px solid black !important; /* Pertegas garis bawah jika perlu, atau sesuaikan */
             }
             .kop-surat h1 { font-size: 14pt !important; margin: 0 !important; line-height: 1.1 !important;}
             .kop-surat h2 { font-size: 13pt !important; margin: 0 !important; line-height: 1.1 !important;}
             .kop-surat h3 { font-size: 12pt !important; margin: 0 !important; line-height: 1.1 !important;}
             .kop-surat p { font-size: 9pt !important; margin: 0 !important; line-height: 1.1 !important;}
             
+            /* Menyesuaikan margin elemen setelah kop surat (nomor surat/judul) */
+            .kop-surat + div {
+                 margin-top: 2px !important; 
+                 margin-bottom: 4px !important;
+            }
+
             .signature-container {
                 margin-top: 0.3rem !important;
             }
@@ -258,6 +247,7 @@
                 suamiStatus: 'JEJAKA',
                 
                 ayahSuamiNama: 'DARSIMAN',
+                ayahSuamiBin: 'KAKEK SUAMI',
                 ayahSuamiNik: '1811060706790002',
                 ayahSuamiTempatLahir: 'LAMPUNG TENGAH',
                 ayahSuamiTglLahir: '07-08-1979',
@@ -267,6 +257,7 @@
                 ayahSuamiAlamat: 'Desa Fajar Asri Rt/Rw 006/002 Kecamatan Panca Jaya Kabupaten Mesuji',
 
                 ibuSuamiNama: 'SITI MARHAMAH',
+                ibuSuamiBinti: 'NENEK SUAMI',
                 ibuSuamiNik: '1811064910820001',
                 ibuSuamiTempatLahir: 'LAMPUNG SELATAN',
                 ibuSuamiTglLahir: '09-10-1982',
@@ -286,6 +277,7 @@
                 istriStatus: 'PERAWAN',
                 
                 ayahIstriNama: 'MARYONO',
+                ayahIstriBin: 'KAKEK ISTRI',
                 ayahIstriNik: '3301070101700001',
                 ayahIstriTempatLahir: 'CILACAP',
                 ayahIstriTglLahir: '01-01-1970',
@@ -295,6 +287,7 @@
                 ayahIstriAlamat: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kecamatan Maos',
 
                 ibuIstriNama: 'SULASTRI',
+                ibuIstriBinti: 'NENEK ISTRI',
                 ibuIstriNik: '3301070202750001',
                 ibuIstriTempatLahir: 'CILACAP',
                 ibuIstriTglLahir: '02-02-1975',
@@ -499,6 +492,7 @@
 
             const ayahPemohon = {
                 nama: isMale ? data.ayahSuamiNama : data.ayahIstriNama,
+                bin: isMale ? data.ayahSuamiBin : data.ayahIstriBin,
                 nik: isMale ? data.ayahSuamiNik : data.ayahIstriNik,
                 tempatLahir: isMale ? data.ayahSuamiTempatLahir : data.ayahIstriTempatLahir,
                 tglLahir: isMale ? data.ayahSuamiTglLahir : data.ayahIstriTglLahir,
@@ -510,6 +504,7 @@
 
             const ibuPemohon = {
                 nama: isMale ? data.ibuSuamiNama : data.ibuIstriNama,
+                binti: isMale ? data.ibuSuamiBinti : data.ibuIstriBinti,
                 nik: isMale ? data.ibuSuamiNik : data.ibuIstriNik,
                 tempatLahir: isMale ? data.ibuSuamiTempatLahir : data.ibuIstriTempatLahir,
                 tglLahir: isMale ? data.ibuSuamiTglLahir : data.ibuIstriTglLahir,
@@ -793,7 +788,8 @@
                                             <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60">
                                                 <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Data Ayah Suami</h4>
                                                 <div className="space-y-1">
-                                                    <InputField label="Nama Ayah (Sbg Bin)" name="ayahSuamiNama" value={data.ayahSuamiNama} onChange={handleChange} />
+                                                    <InputField label="Nama Ayah" name="ayahSuamiNama" value={data.ayahSuamiNama} onChange={handleChange} />
+                                                    <InputField label="Bin (Nama Ayah dari Ayah)" name="ayahSuamiBin" value={data.ayahSuamiBin} onChange={handleChange} />
                                                     <InputField label="NIK Ayah" name="ayahSuamiNik" value={data.ayahSuamiNik} onChange={handleChange} />
                                                     <InputField label="Tempat Lahir" name="ayahSuamiTempatLahir" value={data.ayahSuamiTempatLahir} onChange={handleChange} />
                                                     <InputField label="Tanggal Lahir" name="ayahSuamiTglLahir" value={data.ayahSuamiTglLahir} onChange={handleChange} />
@@ -805,6 +801,7 @@
                                                 <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Data Ibu Suami</h4>
                                                 <div className="space-y-1">
                                                     <InputField label="Nama Ibu" name="ibuSuamiNama" value={data.ibuSuamiNama} onChange={handleChange} />
+                                                    <InputField label="Binti (Nama Ayah dari Ibu)" name="ibuSuamiBinti" value={data.ibuSuamiBinti} onChange={handleChange} />
                                                     <InputField label="NIK Ibu" name="ibuSuamiNik" value={data.ibuSuamiNik} onChange={handleChange} />
                                                     <InputField label="Tempat Lahir" name="ibuSuamiTempatLahir" value={data.ibuSuamiTempatLahir} onChange={handleChange} />
                                                     <InputField label="Tanggal Lahir" name="ibuSuamiTglLahir" value={data.ibuSuamiTglLahir} onChange={handleChange} />
@@ -841,7 +838,8 @@
                                             <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60">
                                                 <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Data Ayah Istri</h4>
                                                 <div className="space-y-1">
-                                                    <InputField label="Nama Ayah (Sbg Binti)" name="ayahIstriNama" value={data.ayahIstriNama} onChange={handleChange} />
+                                                    <InputField label="Nama Ayah" name="ayahIstriNama" value={data.ayahIstriNama} onChange={handleChange} />
+                                                    <InputField label="Bin (Nama Ayah dari Ayah)" name="ayahIstriBin" value={data.ayahIstriBin} onChange={handleChange} />
                                                     <InputField label="NIK Ayah" name="ayahIstriNik" value={data.ayahIstriNik} onChange={handleChange} />
                                                     <InputField label="Tempat Lahir" name="ayahIstriTempatLahir" value={data.ayahIstriTempatLahir} onChange={handleChange} />
                                                     <InputField label="Tanggal Lahir" name="ayahIstriTglLahir" value={data.ayahIstriTglLahir} onChange={handleChange} />
@@ -853,6 +851,7 @@
                                                 <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Data Ibu Istri</h4>
                                                 <div className="space-y-1">
                                                     <InputField label="Nama Ibu" name="ibuIstriNama" value={data.ibuIstriNama} onChange={handleChange} />
+                                                    <InputField label="Binti (Nama Ayah dari Ibu)" name="ibuIstriBinti" value={data.ibuIstriBinti} onChange={handleChange} />
                                                     <InputField label="NIK Ibu" name="ibuIstriNik" value={data.ibuIstriNik} onChange={handleChange} />
                                                     <InputField label="Tempat Lahir" name="ibuIstriTempatLahir" value={data.ibuIstriTempatLahir} onChange={handleChange} />
                                                     <InputField label="Tanggal Lahir" name="ibuIstriTglLahir" value={data.ibuIstriTglLahir} onChange={handleChange} />
@@ -1317,29 +1316,31 @@
 
                                     <p className="mb-4 text-justify">Yang bertanda tangan di bawah ini:</p>
                                     
-                                    <p className="font-bold mb-2">A.</p>
+                                    <p className="font-bold mb-2">A. Ayah Kandung:</p>
                                     <table className="form-table w-full mb-4 ml-4">
                                         <tbody>
                                             <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{ayahPemohon.nama}</td></tr>
-                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{ayahPemohon.nik}</td></tr>
-                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{ayahPemohon.tempatLahir}, {ayahPemohon.tglLahir}</td></tr>
-                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{ayahPemohon.warga}</td></tr>
-                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{ayahPemohon.agama}</td></tr>
-                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{ayahPemohon.kerja}</td></tr>
-                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{ayahPemohon.alamat}</td></tr>
+                                            <tr><td>2.</td><td>Bin</td><td>:</td><td>{ayahPemohon.bin}</td></tr>
+                                            <tr><td>3.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{ayahPemohon.nik}</td></tr>
+                                            <tr><td>4.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{ayahPemohon.tempatLahir}, {ayahPemohon.tglLahir}</td></tr>
+                                            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>{ayahPemohon.warga}</td></tr>
+                                            <tr><td>6.</td><td>Agama</td><td>:</td><td>{ayahPemohon.agama}</td></tr>
+                                            <tr><td>7.</td><td>Pekerjaan</td><td>:</td><td>{ayahPemohon.kerja}</td></tr>
+                                            <tr><td>8.</td><td>Alamat</td><td>:</td><td>{ayahPemohon.alamat}</td></tr>
                                         </tbody>
                                     </table>
 
-                                    <p className="font-bold mb-2">B.</p>
+                                    <p className="font-bold mb-2">B. Ibu Kandung:</p>
                                     <table className="form-table w-full mb-6 ml-4">
                                         <tbody>
                                             <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{ibuPemohon.nama}</td></tr>
-                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{ibuPemohon.nik}</td></tr>
-                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{ibuPemohon.tempatLahir}, {ibuPemohon.tglLahir}</td></tr>
-                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{ibuPemohon.warga}</td></tr>
-                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{ibuPemohon.agama}</td></tr>
-                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{ibuPemohon.kerja}</td></tr>
-                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{ibuPemohon.alamat}</td></tr>
+                                            <tr><td>2.</td><td>Binti</td><td>:</td><td>{ibuPemohon.binti}</td></tr>
+                                            <tr><td>3.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{ibuPemohon.nik}</td></tr>
+                                            <tr><td>4.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{ibuPemohon.tempatLahir}, {ibuPemohon.tglLahir}</td></tr>
+                                            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>{ibuPemohon.warga}</td></tr>
+                                            <tr><td>6.</td><td>Agama</td><td>:</td><td>{ibuPemohon.agama}</td></tr>
+                                            <tr><td>7.</td><td>Pekerjaan</td><td>:</td><td>{ibuPemohon.kerja}</td></tr>
+                                            <tr><td>8.</td><td>Alamat</td><td>:</td><td>{ibuPemohon.alamat}</td></tr>
                                         </tbody>
                                     </table>
 
@@ -1347,12 +1348,13 @@
                                     <table className="form-table w-full mb-6 ml-4">
                                         <tbody>
                                             <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{pemohon.nama}</td></tr>
-                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{pemohon.nik}</td></tr>
-                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{pemohon.tempatLahir}, {pemohon.tglLahir}</td></tr>
-                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{pemohon.warga}</td></tr>
-                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{pemohon.agama}</td></tr>
-                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{pemohon.kerja}</td></tr>
-                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{pemohon.alamat}</td></tr>
+                                            <tr><td>2.</td><td>{pemohon.binBintiLabel}</td><td>:</td><td>{pemohon.binBintiName}</td></tr>
+                                            <tr><td>3.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{pemohon.nik}</td></tr>
+                                            <tr><td>4.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{pemohon.tempatLahir}, {pemohon.tglLahir}</td></tr>
+                                            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>{pemohon.warga}</td></tr>
+                                            <tr><td>6.</td><td>Agama</td><td>:</td><td>{pemohon.agama}</td></tr>
+                                            <tr><td>7.</td><td>Pekerjaan</td><td>:</td><td>{pemohon.kerja}</td></tr>
+                                            <tr><td>8.</td><td>Alamat</td><td>:</td><td>{pemohon.alamat}</td></tr>
                                         </tbody>
                                     </table>
 
@@ -1361,12 +1363,13 @@
                                     <table className="form-table w-full mb-6 ml-4">
                                         <tbody>
                                             <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{pasangan.nama}</td></tr>
-                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{pasangan.nik}</td></tr>
-                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{pasangan.tempatLahir}, {pasangan.tglLahir}</td></tr>
-                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{pasangan.warga}</td></tr>
-                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{pasangan.agama}</td></tr>
-                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{pasangan.kerja}</td></tr>
-                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{pasangan.alamat}</td></tr>
+                                            <tr><td>2.</td><td>{pasangan.binBintiLabel}</td><td>:</td><td>{pasangan.binBintiName}</td></tr>
+                                            <tr><td>3.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{pasangan.nik}</td></tr>
+                                            <tr><td>4.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{pasangan.tempatLahir}, {pasangan.tglLahir}</td></tr>
+                                            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>{pasangan.warga}</td></tr>
+                                            <tr><td>6.</td><td>Agama</td><td>:</td><td>{pasangan.agama}</td></tr>
+                                            <tr><td>7.</td><td>Pekerjaan</td><td>:</td><td>{pasangan.kerja}</td></tr>
+                                            <tr><td>8.</td><td>Alamat</td><td>:</td><td>{pasangan.alamat}</td></tr>
                                         </tbody>
                                     </table>
                                     
@@ -1391,38 +1394,41 @@
                              {/* --- REKOMENDASI NIKAH --- */}
                              {activeTab === 'rekomendasi' && (
                                 <div className="a4-page print-only">
-                                    <div className="kop-surat">
-                                        <div className="print-logo-box">
-                                            {config.logoUrl && <img src={config.logoUrl} alt="Logo Desa" />}
+                                    <div className="kop-surat flex items-center justify-between">
+                                        <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
+                                            {config.logoUrl && <img src={config.logoUrl} alt="Logo Desa" className="w-full h-full object-contain" />}
                                         </div>
-                                        <div className="print-title-box">
+                                        <div className="flex-1 text-center px-2">
                                             <h3>PEMERINTAH KABUPATEN {data.kabupaten}</h3>
                                             <h2>KECAMATAN {data.kecamatan}</h2>
                                             <h1>DESA {data.desa}</h1>
                                             <p>Alamat : Jl. Desa {data.desa} Kecamatan {data.kecamatan} Kabupaten {data.kabupaten} Kode Pos : {data.kodepos}</p>
                                         </div>
-                                        <div className="print-logo-spacer"></div>
+                                        <div className="w-20 h-20 flex-shrink-0"></div>
                                     </div>
 
-                                    <div className="flex justify-between mb-4">
-                                        <table className="w-2/3">
-                                            <tbody>
-                                                <tr><td width="90">Nomor</td><td width="10">:</td><td>{data.nomorSurat}</td></tr>
-                                                <tr><td>Sifat</td><td>:</td><td>Biasa</td></tr>
-                                                <tr><td>Lampiran</td><td>:</td><td>1 (satu) berkas</td></tr>
-                                                <tr><td className="align-top">Hal</td><td className="align-top">:</td><td><strong>Rekomendasi Nikah</strong></td></tr>
-                                            </tbody>
-                                        </table>
-                                        <div className="text-right">
-                                            {data.kecamatan}, {data.tanggalSurat}
+                                    {/* DIV BARU UNTUK KONTROL SPASI SETELAH KOP */}
+                                    <div>
+                                        <div className="flex justify-between mb-4">
+                                            <table className="w-2/3">
+                                                <tbody>
+                                                    <tr><td width="90">Nomor</td><td width="10">:</td><td>{data.nomorSurat}</td></tr>
+                                                    <tr><td>Sifat</td><td>:</td><td>Biasa</td></tr>
+                                                    <tr><td>Lampiran</td><td>:</td><td>1 (satu) berkas</td></tr>
+                                                    <tr><td className="align-top">Hal</td><td className="align-top">:</td><td><strong>Rekomendasi Nikah</strong></td></tr>
+                                                </tbody>
+                                            </table>
+                                            <div className="text-right">
+                                                {data.kecamatan}, {data.tanggalSurat}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="mb-4">
-                                        <p>Kepada Yth,</p>
-                                        <p>Kepala KUA Kecamatan / PPN LN</p>
-                                        <p className="font-bold uppercase">{data.kuaTujuan}</p>
-                                        <p>di tempat</p>
+                                        <div className="mb-4">
+                                            <p>Kepada Yth,</p>
+                                            <p>Kepala KUA Kecamatan / PPN LN</p>
+                                            <p className="font-bold uppercase">{data.kuaTujuan}</p>
+                                            <p>di tempat</p>
+                                        </div>
                                     </div>
 
                                     <p className="mb-3 text-justify">Berdasarkan surat keterangan dari Kepala Desa/Kelurahan {data.desa} Nomor: {data.nomorSurat} Tanggal {data.tanggalSurat}, dengan ini menerangkan bahwa:</p>
@@ -1478,22 +1484,25 @@
                              {/* --- NUMPANG NIKAH --- */}
                              {activeTab === 'numpang' && (
                                 <div className="a4-page print-only">
-                                    <div className="kop-surat">
-                                        <div className="print-logo-box">
-                                            {config.logoUrl && <img src={config.logoUrl} alt="Logo Desa" />}
+                                    <div className="kop-surat flex items-center justify-between">
+                                        <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
+                                            {config.logoUrl && <img src={config.logoUrl} alt="Logo Desa" className="w-full h-full object-contain" />}
                                         </div>
-                                        <div className="print-title-box">
+                                        <div className="flex-1 text-center px-2">
                                             <h3>PEMERINTAH KABUPATEN {data.kabupaten}</h3>
                                             <h2>KECAMATAN {data.kecamatan}</h2>
                                             <h1>DESA {data.desa}</h1>
                                             <p>Alamat : Jl. Desa {data.desa} Kecamatan {data.kecamatan} Kabupaten {data.kabupaten} Kode Pos : {data.kodepos}</p>
                                         </div>
-                                        <div className="print-logo-spacer"></div>
+                                        <div className="w-20 h-20 flex-shrink-0"></div>
                                     </div>
 
-                                    <div className="text-center mb-6">
-                                        <h3 className="font-bold underline text-xl">SURAT KETERANGAN NUMPANG NIKAH</h3>
-                                        <p>Nomor: {data.nomorSurat}</p>
+                                    {/* DIV BARU UNTUK KONTROL SPASI SETELAH KOP */}
+                                    <div>
+                                        <div className="text-center mb-6">
+                                            <h3 className="font-bold underline text-xl">SURAT KETERANGAN NUMPANG NIKAH</h3>
+                                            <p>Nomor: {data.nomorSurat}</p>
+                                        </div>
                                     </div>
 
                                     <p className="mb-4 text-justify">Yang bertanda tangan di bawah ini Kepala desa {data.desa} Kecamatan {data.kecamatan} Kabupaten {data.kabupaten} menerangkan bahwa :</p>
