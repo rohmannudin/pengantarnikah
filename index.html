@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Surat NA Premium 2026</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        premium: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        @media print {
+            body, html, #root, .h-screen, .overflow-hidden, .overflow-y-auto, .flex-1, .flex {
+                height: auto !important;
+                min-height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+                position: static !important;
+                background-color: white !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .a4-page {
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                margin: 0 !important;
+                padding: 6mm 10mm !important;
+                box-sizing: border-box !important;
+                box-shadow: none !important;
+                background: white !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                font-size: 10pt !important;
+                line-height: 1.1 !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                overflow: hidden !important;
+            }
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            
+            .mb-12 { margin-bottom: 0.5rem !important; }
+            .mb-10 { margin-bottom: 0.4rem !important; }
+            .mt-10 { margin-top: 0.4rem !important; }
+            .mt-12 { margin-top: 0.5rem !important; }
+            .mb-8 { margin-bottom: 0.3rem !important; }
+            .mb-6 { margin-bottom: 0.2rem !important; }
+            .mb-4 { margin-bottom: 0.15rem !important; }
+            .mb-2 { margin-bottom: 0.05rem !important; }
+            h2, h3 { margin-bottom: 0.15rem !important; }
+            p.mb-4 { margin-bottom: 0.15rem !important; }
+            
+            .form-table td, table td {
+                padding: 0px 2px !important;
+                line-height: 1.05 !important;
+            }
+            
+            .py-1 {
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+            }
+
+            /* --- KOP SURAT PRINT ADJUSTMENTS & PERFECT ALIGNMENT --- */
+            .kop-surat {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                margin-bottom: 8px !important;
+                padding-top: 6px !important;
+                padding-bottom: 6px !important;
+                border-bottom: 2px solid black !important;
+            }
+            .kop-surat .print-logo-box {
+                width: 1.8cm !important;
+                height: 1.8cm !important;
+                flex-shrink: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+            .kop-surat .print-logo-box img {
+                max-width: 100% !important;
+                max-height: 100% !important;
+                object-fit: contain !important;
+            }
+            .kop-surat .print-title-box {
+                flex: 1 !important;
+                text-align: center !important;
+                padding: 0 4px !important;
+            }
+            .kop-surat .print-logo-spacer {
+                width: 1.8cm !important;
+                flex-shrink: 0 !important;
+            }
+            .kop-surat h1 { font-size: 14pt !important; margin: 0 !important; line-height: 1.1 !important;}
+            .kop-surat h2 { font-size: 13pt !important; margin: 0 !important; line-height: 1.1 !important;}
+            .kop-surat h3 { font-size: 12pt !important; margin: 0 !important; line-height: 1.1 !important;}
+            .kop-surat p { font-size: 9pt !important; margin: 0 !important; line-height: 1.1 !important;}
+            
+            .signature-container {
+                margin-top: 0.3rem !important;
+            }
+        }
+
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 2rem auto;
+            padding: 20mm;
+            background: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: black;
+            box-sizing: border-box;
+            border-radius: 8px;
+        }
+
+        .kop-surat {
+            text-align: center;
+            border-bottom: 3px solid black;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .kop-surat h1 { font-size: 16pt; font-weight: bold; margin: 0; }
+        .kop-surat h2 { font-size: 18pt; font-weight: bold; margin: 0; }
+        .kop-surat h3 { font-size: 14pt; font-weight: bold; margin: 0; }
+        .kop-surat p { font-size: 10pt; margin: 0; }
+
+        .form-table td {
+            vertical-align: top;
+            padding: 2px 4px;
+        }
+        .form-table td:nth-child(1) { width: 30px; }
+        .form-table td:nth-child(2) { width: 200px; }
+        .form-table td:nth-child(3) { width: 10px; }
+
+        .signature-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 2.5rem;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-slate-100 font-sans min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const InputField = ({ label, name, value, onChange, type = "text", placeholder = "", icon = "" }) => (
+            <div className="mb-4">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                    {icon && <i className={`ph ${icon} text-indigo-400 text-sm`}></i>}
+                    {label}
+                </label>
+                <input 
+                    type={type} 
+                    name={name} 
+                    value={value} 
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    className="w-full px-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-slate-500 text-sm transition-all shadow-inner"
+                />
+            </div>
+        );
+
+        function App() {
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [loginError, setLoginError] = useState('');
+
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [activeTab, setActiveTab] = useState('n1');
+            
+            const [notification, setNotification] = useState(null);
+            const [savedProfiles, setSavedProfiles] = useState([]);
+
+            const [config, setConfig] = useState({
+                username: 'NALAKILAKI',
+                password: 'NALAKILAKI',
+                email: '',
+                logoUrl: ''
+            });
+            const [isForgotPass, setIsForgotPass] = useState(false);
+            const [recoveryEmail, setRecoveryEmail] = useState('');
+            const [resetStep, setResetStep] = useState(1);
+            const [newPass, setNewPass] = useState('');
+            const [settingsData, setSettingsData] = useState({
+                username: '',
+                password: '',
+                email: ''
+            });
+
+            const [data, setData] = useState({
+                jenisPemohon: 'L',
+                nomorSurat: '400/       /06.2005/MSJ/VI/2026',
+                tanggalSurat: '17-06-2026',
+                kades: 'KEPALA DESA FAJAR ASRI',
+                kabupaten: 'MESUJI',
+                kecamatan: 'PANCA JAYA',
+                desa: 'FAJAR ASRI',
+                kodepos: '34698',
+                provinsi: 'LAMPUNG',
+                waktuAkad: '08.00 s/d Selesai',
+                tempatAkad: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kec. Maos Kab. Cilacap',
+                kuaTujuan: 'KECAMATAN MAOS KABUPATEN CILACAP',
+
+                suamiNama: 'RUDI ANTO',
+                suamiNik: '1811060808020001',
+                suamiTempatLahir: 'LAMPUNG UTARA',
+                suamiTglLahir: '08-07-2002',
+                suamiWarga: 'INDONESIA',
+                suamiAgama: 'ISLAM',
+                suamiKerja: 'WIRASWASTA',
+                suamiAlamat: 'Desa Fajar Asri Rt/Rw 006/002 Kecamatan Panca Jaya Kabupaten Mesuji',
+                suamiStatus: 'JEJAKA',
+                
+                ayahSuamiNama: 'DARSIMAN',
+                ayahSuamiNik: '1811060706790002',
+                ayahSuamiTempatLahir: 'LAMPUNG TENGAH',
+                ayahSuamiTglLahir: '07-08-1979',
+                ayahSuamiWarga: 'INDONESIA',
+                ayahSuamiAgama: 'ISLAM',
+                ayahSuamiKerja: 'PETANI/PEKEBUN',
+                ayahSuamiAlamat: 'Desa Fajar Asri Rt/Rw 006/002 Kecamatan Panca Jaya Kabupaten Mesuji',
+
+                ibuSuamiNama: 'SITI MARHAMAH',
+                ibuSuamiNik: '1811064910820001',
+                ibuSuamiTempatLahir: 'LAMPUNG SELATAN',
+                ibuSuamiTglLahir: '09-10-1982',
+                ibuSuamiWarga: 'INDONESIA',
+                ibuSuamiAgama: 'ISLAM',
+                ibuSuamiKerja: 'BURUH TANI/PEKEBUN',
+                ibuSuamiAlamat: 'Desa Fajar Asri Rt/Rw 006/002 Kecamatan Panca Jaya Kabupaten Mesuji',
+
+                istriNama: 'MERI JUNIATI',
+                istriNik: '3301074706990001',
+                istriTempatLahir: 'CILACAP',
+                istriTglLahir: '13-06-1999',
+                istriWarga: 'INDONESIA',
+                istriAgama: 'ISLAM',
+                istriKerja: 'MENGURUS RUMAH TANGGA',
+                istriAlamat: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kecamatan Maos',
+                istriStatus: 'PERAWAN',
+                
+                ayahIstriNama: 'MARYONO',
+                ayahIstriNik: '3301070101700001',
+                ayahIstriTempatLahir: 'CILACAP',
+                ayahIstriTglLahir: '01-01-1970',
+                ayahIstriWarga: 'INDONESIA',
+                ayahIstriAgama: 'ISLAM',
+                ayahIstriKerja: 'PETANI/PEKEBUN',
+                ayahIstriAlamat: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kecamatan Maos',
+
+                ibuIstriNama: 'SULASTRI',
+                ibuIstriNik: '3301070202750001',
+                ibuIstriTempatLahir: 'CILACAP',
+                ibuIstriTglLahir: '02-02-1975',
+                ibuIstriWarga: 'INDONESIA',
+                ibuIstriAgama: 'ISLAM',
+                ibuIstriKerja: 'MENGURUS RUMAH TANGGA',
+                ibuIstriAlamat: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kecamatan Maos'
+            });
+
+            useEffect(() => {
+                const saved = localStorage.getItem('sim_na_premium_saved');
+                if (saved) {
+                    try {
+                        setSavedProfiles(JSON.parse(saved));
+                    } catch (e) {
+                        console.error("Gagal memuat data", e);
+                    }
+                }
+
+                const savedConfig = localStorage.getItem('sim_na_config');
+                if (savedConfig) {
+                    try {
+                        const parsed = JSON.parse(savedConfig);
+                        setConfig(parsed);
+                        setSettingsData({
+                            username: parsed.username,
+                            password: parsed.password,
+                            email: parsed.email || ''
+                        });
+                    } catch (e) {
+                        console.error("Gagal memuat config", e);
+                    }
+                } else {
+                    setSettingsData({
+                        username: 'NALAKILAKI',
+                        password: 'NALAKILAKI',
+                        email: ''
+                    });
+                }
+            }, []);
+
+            const showNotification = (msg, type = 'success') => {
+                setNotification({ message: msg, type });
+                setTimeout(() => setNotification(null), 3500);
+            };
+
+            const saveCurrentData = () => {
+                const newProfile = {
+                    id: Date.now(),
+                    date: new Date().toLocaleString('id-ID'),
+                    label: `${data.suamiNama || 'Suami'} & ${data.istriNama || 'Istri'} (${data.jenisPemohon === 'L' ? 'Laki-laki' : 'Perempuan'})`,
+                    data: { ...data }
+                };
+                const updatedProfiles = [newProfile, ...savedProfiles].slice(0, 10);
+                setSavedProfiles(updatedProfiles);
+                localStorage.setItem('sim_na_premium_saved', JSON.stringify(updatedProfiles));
+                showNotification('Draft berhasil disimpan ke memori lokal!');
+            };
+
+            const loadData = (profile) => {
+                setData(profile.data);
+                showNotification(`Draft ${profile.label} berhasil dimuat!`);
+            };
+
+            const deleteProfile = (id) => {
+                const updated = savedProfiles.filter(p => p.id !== id);
+                setSavedProfiles(updated);
+                localStorage.setItem('sim_na_premium_saved', JSON.stringify(updated));
+                showNotification('Draft berhasil dihapus.', 'error');
+            };
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                if (username.toUpperCase() === config.username.toUpperCase() && password === config.password) {
+                    setIsAuthenticated(true);
+                    setLoginError('');
+                    showNotification('Autentikasi Berhasil! Selamat datang.');
+                } else {
+                    setLoginError('Kredensial tidak valid!');
+                }
+            };
+
+            const saveConfig = (e) => {
+                e.preventDefault();
+                const newConfig = { ...config, ...settingsData };
+                setConfig(newConfig);
+                localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
+                showNotification('Pengaturan berhasil disimpan!');
+            };
+
+            const handleLogoUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const newConfig = { ...config, logoUrl: reader.result };
+                        setConfig(newConfig);
+                        localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
+                        showNotification('Logo berhasil diperbarui!');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const handleRecovery = (e) => {
+                e.preventDefault();
+                if (resetStep === 1) {
+                    if (!config.email) {
+                        setLoginError('Sistem belum memiliki email pemulihan terdaftar. Hubungi Administrator.');
+                    } else if (recoveryEmail.toLowerCase() === config.email.toLowerCase()) {
+                        setResetStep(2);
+                        setLoginError('');
+                    } else {
+                        setLoginError('Email tidak cocok dengan data terdaftar!');
+                    }
+                } else if (resetStep === 2) {
+                    if (newPass.length < 4) {
+                        setLoginError('Kata sandi minimal 4 karakter!');
+                        return;
+                    }
+                    const newConfig = { ...config, password: newPass };
+                    setConfig(newConfig);
+                    localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
+                    
+                    setSettingsData(prev => ({ ...prev, password: newPass }));
+                    showNotification('Kata sandi berhasil direset! Silakan login.');
+                    setIsForgotPass(false);
+                    setResetStep(1);
+                    setPassword('');
+                    setNewPass('');
+                    setRecoveryEmail('');
+                }
+            };
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setData(prev => ({ ...prev, [name]: value.toUpperCase() }));
+            };
+
+            const setJenisPemohon = (jenis) => {
+                setData(prev => ({ ...prev, jenisPemohon: jenis }));
+            };
+
+            const handlePrint = () => {
+                window.print();
+            };
+
+            const handleDownloadPDF = () => {
+                showNotification('Mempersiapkan dokumen PDF... Silakan pilih "Save as PDF" pada jendela printer.');
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+            };
+
+            const enterDocumentDashboard = () => {
+                setIsLoggedIn(true);
+                window.scrollTo(0, 0);
+            };
+
+            const tabs = [
+                { id: 'n1', label: 'Model N1 (Pengantar)', icon: 'ph-file-text' },
+                { id: 'n2', label: 'Model N2 (Permohonan)', icon: 'ph-file-text' },
+                { id: 'n3', label: 'Model N3 (Persetujuan)', icon: 'ph-file-text' },
+                { id: 'n4', label: 'Model N4 (Persetujuan N4)', icon: 'ph-file-text' },
+                { id: 'n5', label: 'Model N5 (Izin Ortu)', icon: 'ph-file-text' },
+                { id: 'rekomendasi', label: 'Rekomendasi Nikah', icon: 'ph-stamp' },
+                { id: 'numpang', label: 'Numpang Nikah', icon: 'ph-file-text' },
+                { id: 'belum_nikah', label: 'Ket. Belum Nikah', icon: 'ph-file-text' },
+                { id: 'pengaturan', label: 'Pengaturan Sistem', icon: 'ph-gear' },
+            ];
+
+            const isMale = data.jenisPemohon === 'L';
+            const pemohon = {
+                nama: isMale ? data.suamiNama : data.istriNama,
+                binBintiLabel: isMale ? 'Bin' : 'Binti',
+                binBintiName: isMale ? data.ayahSuamiNama : data.ayahIstriNama,
+                nik: isMale ? data.suamiNik : data.istriNik,
+                jk: isMale ? 'LAKI-LAKI' : 'PEREMPUAN',
+                tempatLahir: isMale ? data.suamiTempatLahir : data.istriTempatLahir,
+                tglLahir: isMale ? data.suamiTglLahir : data.istriTglLahir,
+                warga: isMale ? data.suamiWarga : data.istriWarga,
+                agama: isMale ? data.suamiAgama : data.istriAgama,
+                kerja: isMale ? data.suamiKerja : data.istriKerja,
+                alamat: isMale ? data.suamiAlamat : data.istriAlamat,
+                status: isMale ? data.suamiStatus : data.istriStatus,
+            };
+
+            const pasangan = {
+                nama: isMale ? data.istriNama : data.suamiNama,
+                binBintiLabel: isMale ? 'Binti' : 'Bin',
+                binBintiName: isMale ? data.ayahIstriNama : data.ayahSuamiNama,
+                nik: isMale ? data.istriNik : data.suamiNik,
+                jk: isMale ? 'PEREMPUAN' : 'LAKI-LAKI',
+                tempatLahir: isMale ? data.istriTempatLahir : data.suamiTempatLahir,
+                tglLahir: isMale ? data.istriTglLahir : data.suamiTglLahir,
+                warga: isMale ? data.istriWarga : data.suamiWarga,
+                agama: isMale ? data.istriAgama : data.suamiAgama,
+                kerja: isMale ? data.istriKerja : data.suamiKerja,
+                alamat: isMale ? data.istriAlamat : data.suamiAlamat,
+                status: isMale ? data.istriStatus : data.suamiStatus,
+            };
+
+            const ayahPemohon = {
+                nama: isMale ? data.ayahSuamiNama : data.ayahIstriNama,
+                nik: isMale ? data.ayahSuamiNik : data.ayahIstriNik,
+                tempatLahir: isMale ? data.ayahSuamiTempatLahir : data.ayahIstriTempatLahir,
+                tglLahir: isMale ? data.ayahSuamiTglLahir : data.ayahIstriTglLahir,
+                warga: isMale ? data.ayahSuamiWarga : data.ayahIstriWarga,
+                agama: isMale ? data.ayahSuamiAgama : data.ayahIstriAgama,
+                kerja: isMale ? data.ayahSuamiKerja : data.ayahIstriKerja,
+                alamat: isMale ? data.ayahSuamiAlamat : data.ayahIstriAlamat,
+            };
+
+            const ibuPemohon = {
+                nama: isMale ? data.ibuSuamiNama : data.ibuIstriNama,
+                nik: isMale ? data.ibuSuamiNik : data.ibuIstriNik,
+                tempatLahir: isMale ? data.ibuSuamiTempatLahir : data.ibuIstriTempatLahir,
+                tglLahir: isMale ? data.ibuSuamiTglLahir : data.ibuIstriTglLahir,
+                warga: isMale ? data.ibuSuamiWarga : data.ibuIstriWarga,
+                agama: isMale ? data.ibuSuamiAgama : data.ibuIstriAgama,
+                kerja: isMale ? data.ibuSuamiKerja : data.ibuIstriKerja,
+                alamat: isMale ? data.ibuSuamiAlamat : data.ibuIstriAlamat,
+            };
+
+            if (!isAuthenticated) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-slate-950">
+                        <div className="absolute -top-32 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                        
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 p-8 sm:p-10 rounded-3xl shadow-2xl w-full max-w-md z-10 relative">
+                            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-tr from-indigo-600 to-emerald-500 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 overflow-hidden">
+                                {config.logoUrl ? (
+                                    <img src={config.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                                ) : (
+                                    <i className="ph ph-shield-check text-3xl text-white"></i>
+                                )}
+                            </div>
+
+                            <div className="text-center mt-6 mb-8">
+                                <span className="inline-block px-3 py-1 bg-indigo-500/10 text-indigo-400 text-xs font-semibold rounded-full mb-2 tracking-wide uppercase border border-indigo-500/20">Secure Portal</span>
+                                <h1 className="text-2xl font-black text-white tracking-tight">SIM NA PREMIUM 2026</h1>
+                                <p className="text-slate-400 text-sm mt-1">Sistem Administrasi Nikah Desa</p>
+                            </div>
+                            
+                            {!isForgotPass ? (
+                                <form onSubmit={handleLogin} className="space-y-5">
+                                    <div>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                                <i className="ph ph-user text-slate-500 text-lg"></i>
+                                            </div>
+                                            <input 
+                                                type="text" 
+                                                value={username} 
+                                                onChange={e => setUsername(e.target.value)} 
+                                                className="w-full pl-11 pr-4 py-3.5 bg-slate-800/90 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-slate-500 transition-all outline-none text-sm" 
+                                                placeholder="Username"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                                <i className="ph ph-key text-slate-500 text-lg"></i>
+                                            </div>
+                                            <input 
+                                                type="password" 
+                                                value={password} 
+                                                onChange={e => setPassword(e.target.value)} 
+                                                className="w-full pl-11 pr-4 py-3.5 bg-slate-800/90 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-slate-500 transition-all outline-none text-sm" 
+                                                placeholder="Kata Sandi"
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    {loginError && (
+                                        <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3.5 rounded-xl text-xs flex items-center gap-2.5 animate-pulse">
+                                            <i className="ph ph-warning-circle text-lg shrink-0"></i>
+                                            <span>{loginError}</span>
+                                        </div>
+                                    )}
+                                    
+                                    <button 
+                                        type="submit" 
+                                        className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold py-3.5 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-indigo-600/30 flex justify-center items-center gap-2 text-sm"
+                                    >
+                                        <span>Masuk Sistem</span>
+                                        <i className="ph ph-arrow-right text-lg"></i>
+                                    </button>
+
+                                    <div className="text-center mt-4">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setIsForgotPass(true); setLoginError(''); setResetStep(1); }} 
+                                            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors font-semibold"
+                                        >
+                                            Lupa Kata Sandi?
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <form onSubmit={handleRecovery} className="space-y-5">
+                                    <div className="text-center mb-4">
+                                        <p className="text-sm text-slate-300">
+                                            {resetStep === 1 ? 'Masukkan email yang terdaftar pada sistem.' : 'Buat kata sandi baru Anda.'}
+                                        </p>
+                                    </div>
+
+                                    {resetStep === 1 ? (
+                                        <div>
+                                            <div className="relative">
+                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                                    <i className="ph ph-envelope text-slate-500 text-lg"></i>
+                                                </div>
+                                                <input 
+                                                    type="email" 
+                                                    value={recoveryEmail} 
+                                                    onChange={e => setRecoveryEmail(e.target.value)} 
+                                                    className="w-full pl-11 pr-4 py-3.5 bg-slate-800/90 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-slate-500 transition-all outline-none text-sm" 
+                                                    placeholder="Email Pemulihan"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <div className="relative">
+                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                                    <i className="ph ph-lock-key text-slate-500 text-lg"></i>
+                                                </div>
+                                                <input 
+                                                    type="password" 
+                                                    value={newPass} 
+                                                    onChange={e => setNewPass(e.target.value)} 
+                                                    className="w-full pl-11 pr-4 py-3.5 bg-slate-800/90 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-slate-500 transition-all outline-none text-sm" 
+                                                    placeholder="Kata Sandi Baru"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {loginError && (
+                                        <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3.5 rounded-xl text-xs flex items-center gap-2.5 animate-pulse">
+                                            <i className="ph ph-warning-circle text-lg shrink-0"></i>
+                                            <span>{loginError}</span>
+                                        </div>
+                                    )}
+                                    
+                                    <button 
+                                        type="submit" 
+                                        className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold py-3.5 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2 text-sm"
+                                    >
+                                        <span>{resetStep === 1 ? 'Verifikasi Email' : 'Simpan Sandi Baru'}</span>
+                                        <i className="ph ph-check-circle text-lg"></i>
+                                    </button>
+
+                                    <div className="text-center mt-4">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setIsForgotPass(false); setLoginError(''); }} 
+                                            className="text-xs text-slate-400 hover:text-slate-300 transition-colors font-semibold"
+                                        >
+                                            Batalkan & Kembali ke Login
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+                        {notification && (
+                            <div className={`fixed bottom-6 right-6 px-5 py-3.5 rounded-2xl shadow-2xl z-50 flex items-center gap-3 border backdrop-blur-md ${notification.type === 'success' ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200' : 'bg-red-950/90 border-red-500/50 text-red-200'}`}>
+                                <i className={`ph ${notification.type === 'success' ? 'ph-check-circle text-emerald-400' : 'ph-warning-circle text-red-400'} text-xl`}></i>
+                                <span className="text-xs font-semibold">{notification.message}</span>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+
+            if (!isLoggedIn) {
+                return (
+                    <div className="min-h-screen py-10 px-4 bg-slate-950 text-slate-100">
+                        <div className="max-w-5xl mx-auto">
+                            <div className="text-center mb-10 relative">
+                                <div className="inline-flex p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl mb-3 text-indigo-400 shadow-inner">
+                                    <i className="ph ph-file-dashed text-4xl"></i>
+                                </div>
+                                <h1 className="text-3xl font-black tracking-tight text-white">Dashboard Input Data Surat NA</h1>
+                                <p className="text-slate-400 text-sm mt-1 max-w-xl mx-auto">Kelola data pemohon, administrasi kantor desa, dan keluarga untuk kompilasi dokumen otomatis secara instan.</p>
+                            </div>
+
+                            <div className="space-y-6">
+                                {/* Saved Draft Manager */}
+                                <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-6 rounded-3xl shadow-xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/5 rounded-bl-full pointer-events-none"></div>
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 relative z-10">
+                                        <div>
+                                            <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                                <i className="ph ph-floppy-disk text-indigo-400 text-lg"></i> Riwayat Draft Tersimpan
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-0.5">Simpan isian form ke memori lokal browser agar bisa dimuat kembali kapan saja.</p>
+                                        </div>
+                                        <button onClick={saveCurrentData} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-indigo-600/20">
+                                            <i className="ph ph-download-simple text-base"></i> Simpan Draft Saat Ini
+                                        </button>
+                                    </div>
+                                    
+                                    {savedProfiles.length === 0 ? (
+                                        <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 text-center text-xs text-slate-400 italic relative z-10">
+                                            Belum ada draft tersimpan. Klik "Simpan Draft Saat Ini" untuk merekam data formulir.
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-52 overflow-y-auto pr-1 relative z-10">
+                                            {savedProfiles.map(p => (
+                                                <div key={p.id} className="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/80 flex flex-col justify-between shadow-sm hover:border-indigo-500/50 transition-all">
+                                                    <div className="mb-3">
+                                                        <p className="font-bold text-white text-xs leading-tight mb-1 truncate">{p.label}</p>
+                                                        <p className="text-[10px] text-slate-400 flex items-center gap-1"><i className="ph ph-clock"></i> {p.date}</p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button onClick={() => loadData(p)} className="flex-1 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-xl text-xs font-semibold transition-all">
+                                                            Pilih Data
+                                                        </button>
+                                                        <button onClick={() => deleteProfile(p.id)} className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl transition-all" title="Hapus">
+                                                            <i className="ph ph-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Toggle Jenis Pemohon */}
+                                <div className="bg-slate-900/90 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-slate-800 text-center">
+                                    <h3 className="text-sm font-bold text-white mb-3">Pilih Pihak Pemohon Utama (Warga Desa Ini)</h3>
+                                    <div className="flex justify-center gap-4">
+                                        <button 
+                                            onClick={() => setJenisPemohon('L')}
+                                            className={`px-6 py-3.5 rounded-2xl border text-xs font-bold transition-all flex items-center gap-2.5 ${data.jenisPemohon === 'L' ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300 shadow-lg shadow-indigo-600/20 ring-2 ring-indigo-500/30' : 'bg-slate-800/60 border-slate-700 text-slate-400 hover:border-slate-600'}`}
+                                        >
+                                            <i className="ph ph-gender-male text-lg"></i> Calon Suami (Laki-laki)
+                                        </button>
+                                        <button 
+                                            onClick={() => setJenisPemohon('P')}
+                                            className={`px-6 py-3.5 rounded-2xl border text-xs font-bold transition-all flex items-center gap-2.5 ${data.jenisPemohon === 'P' ? 'bg-pink-600/20 border-pink-500 text-pink-300 shadow-lg shadow-pink-600/20 ring-2 ring-pink-500/30' : 'bg-slate-800/60 border-slate-700 text-slate-400 hover:border-slate-600'}`}
+                                        >
+                                            <i className="ph ph-gender-female text-lg"></i> Calon Istri (Perempuan)
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Administrasi */}
+                                <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
+                                    <h3 className="text-base font-bold text-white border-b border-slate-800 pb-3 mb-5 flex items-center gap-2">
+                                        <i className="ph ph-map-pin text-indigo-400"></i> Data Administrasi & KUA Tujuan
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <InputField label="Nomor Surat" name="nomorSurat" value={data.nomorSurat} onChange={handleChange} icon="ph-hash" />
+                                        <InputField label="Tanggal Surat" name="tanggalSurat" value={data.tanggalSurat} onChange={handleChange} icon="ph-calendar" />
+                                        <InputField label="Nama Kepala Desa" name="kades" value={data.kades} onChange={handleChange} icon="ph-user-gear" />
+                                        <InputField label="Desa" name="desa" value={data.desa} onChange={handleChange} icon="ph-buildings" />
+                                        <InputField label="Kecamatan" name="kecamatan" value={data.kecamatan} onChange={handleChange} icon="ph-map-trifold" />
+                                        <InputField label="Kabupaten" name="kabupaten" value={data.kabupaten} onChange={handleChange} icon="ph-globe" />
+                                        <InputField label="Waktu Akad" name="waktuAkad" value={data.waktuAkad} onChange={handleChange} icon="ph-clock" />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                        <InputField label="Tempat Pelaksanaan Akad Nikah" name="tempatAkad" value={data.tempatAkad} onChange={handleChange} icon="ph-map-pin" />
+                                        <InputField label="KUA Tujuan (Rekomendasi)" name="kuaTujuan" value={data.kuaTujuan} onChange={handleChange} placeholder="KEC. MAOS KAB. CILACAP" icon="ph-bank" />
+                                    </div>
+                                </div>
+
+                                {/* Calon Suami */}
+                                <div className={`bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800 border-l-4 ${data.jenisPemohon === 'L' ? 'border-l-indigo-500' : 'border-l-slate-700'}`}>
+                                    <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-5">
+                                        <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                            <i className="ph ph-user text-indigo-400"></i> Data Calon Suami 
+                                            {data.jenisPemohon === 'L' && <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2.5 py-0.5 rounded-full uppercase ml-2 font-bold">Pemohon Utama</span>}
+                                        </h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <InputField label="Nama Lengkap" name="suamiNama" value={data.suamiNama} onChange={handleChange} icon="ph-user" />
+                                        <InputField label="NIK" name="suamiNik" value={data.suamiNik} onChange={handleChange} icon="ph-identification-card" />
+                                        <InputField label="Status Perkawinan" name="suamiStatus" value={data.suamiStatus} onChange={handleChange} icon="ph-info" />
+                                        <InputField label="Tempat Lahir" name="suamiTempatLahir" value={data.suamiTempatLahir} onChange={handleChange} icon="ph-map-pin" />
+                                        <InputField label="Tanggal Lahir" name="suamiTglLahir" value={data.suamiTglLahir} onChange={handleChange} icon="ph-calendar" />
+                                        <InputField label="Pekerjaan" name="suamiKerja" value={data.suamiKerja} onChange={handleChange} icon="ph-briefcase" />
+                                        <div className="md:col-span-3">
+                                            <InputField label="Alamat Lengkap" name="suamiAlamat" value={data.suamiAlamat} onChange={handleChange} icon="ph-house" />
+                                        </div>
+                                    </div>
+
+                                    {data.jenisPemohon === 'L' && (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-slate-800">
+                                            <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60">
+                                                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Data Ayah Suami</h4>
+                                                <div className="space-y-1">
+                                                    <InputField label="Nama Ayah (Sbg Bin)" name="ayahSuamiNama" value={data.ayahSuamiNama} onChange={handleChange} />
+                                                    <InputField label="NIK Ayah" name="ayahSuamiNik" value={data.ayahSuamiNik} onChange={handleChange} />
+                                                    <InputField label="Tempat Lahir" name="ayahSuamiTempatLahir" value={data.ayahSuamiTempatLahir} onChange={handleChange} />
+                                                    <InputField label="Tanggal Lahir" name="ayahSuamiTglLahir" value={data.ayahSuamiTglLahir} onChange={handleChange} />
+                                                    <InputField label="Pekerjaan" name="ayahSuamiKerja" value={data.ayahSuamiKerja} onChange={handleChange} />
+                                                    <InputField label="Alamat" name="ayahSuamiAlamat" value={data.ayahSuamiAlamat} onChange={handleChange} />
+                                                </div>
+                                            </div>
+                                            <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60">
+                                                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Data Ibu Suami</h4>
+                                                <div className="space-y-1">
+                                                    <InputField label="Nama Ibu" name="ibuSuamiNama" value={data.ibuSuamiNama} onChange={handleChange} />
+                                                    <InputField label="NIK Ibu" name="ibuSuamiNik" value={data.ibuSuamiNik} onChange={handleChange} />
+                                                    <InputField label="Tempat Lahir" name="ibuSuamiTempatLahir" value={data.ibuSuamiTempatLahir} onChange={handleChange} />
+                                                    <InputField label="Tanggal Lahir" name="ibuSuamiTglLahir" value={data.ibuSuamiTglLahir} onChange={handleChange} />
+                                                    <InputField label="Pekerjaan" name="ibuSuamiKerja" value={data.ibuSuamiKerja} onChange={handleChange} />
+                                                    <InputField label="Alamat" name="ibuSuamiAlamat" value={data.ibuSuamiAlamat} onChange={handleChange} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Calon Istri */}
+                                <div className={`bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800 border-l-4 ${data.jenisPemohon === 'P' ? 'border-l-pink-500' : 'border-l-slate-700'}`}>
+                                    <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-5">
+                                        <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                            <i className="ph ph-user-list text-pink-400"></i> Data Calon Istri 
+                                            {data.jenisPemohon === 'P' && <span className="text-[10px] bg-pink-500/20 text-pink-300 border border-pink-500/30 px-2.5 py-0.5 rounded-full uppercase ml-2 font-bold">Pemohon Utama</span>}
+                                        </h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <InputField label="Nama Lengkap" name="istriNama" value={data.istriNama} onChange={handleChange} icon="ph-user" />
+                                        <InputField label="NIK" name="istriNik" value={data.istriNik} onChange={handleChange} icon="ph-identification-card" />
+                                        <InputField label="Status Perkawinan" name="istriStatus" value={data.istriStatus} onChange={handleChange} icon="ph-info" />
+                                        <InputField label="Tempat Lahir" name="istriTempatLahir" value={data.istriTempatLahir} onChange={handleChange} icon="ph-map-pin" />
+                                        <InputField label="Tanggal Lahir" name="istriTglLahir" value={data.istriTglLahir} onChange={handleChange} icon="ph-calendar" />
+                                        <InputField label="Pekerjaan" name="istriKerja" value={data.istriKerja} onChange={handleChange} icon="ph-briefcase" />
+                                        <div className="md:col-span-3">
+                                            <InputField label="Alamat Lengkap" name="istriAlamat" value={data.istriAlamat} onChange={handleChange} icon="ph-house" />
+                                        </div>
+                                    </div>
+
+                                    {data.jenisPemohon === 'P' && (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-slate-800">
+                                            <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60">
+                                                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Data Ayah Istri</h4>
+                                                <div className="space-y-1">
+                                                    <InputField label="Nama Ayah (Sbg Binti)" name="ayahIstriNama" value={data.ayahIstriNama} onChange={handleChange} />
+                                                    <InputField label="NIK Ayah" name="ayahIstriNik" value={data.ayahIstriNik} onChange={handleChange} />
+                                                    <InputField label="Tempat Lahir" name="ayahIstriTempatLahir" value={data.ayahIstriTempatLahir} onChange={handleChange} />
+                                                    <InputField label="Tanggal Lahir" name="ayahIstriTglLahir" value={data.ayahIstriTglLahir} onChange={handleChange} />
+                                                    <InputField label="Pekerjaan" name="ayahIstriKerja" value={data.ayahIstriKerja} onChange={handleChange} />
+                                                    <InputField label="Alamat" name="ayahIstriAlamat" value={data.ayahIstriAlamat} onChange={handleChange} />
+                                                </div>
+                                            </div>
+                                            <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60">
+                                                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Data Ibu Istri</h4>
+                                                <div className="space-y-1">
+                                                    <InputField label="Nama Ibu" name="ibuIstriNama" value={data.ibuIstriNama} onChange={handleChange} />
+                                                    <InputField label="NIK Ibu" name="ibuIstriNik" value={data.ibuIstriNik} onChange={handleChange} />
+                                                    <InputField label="Tempat Lahir" name="ibuIstriTempatLahir" value={data.ibuIstriTempatLahir} onChange={handleChange} />
+                                                    <InputField label="Tanggal Lahir" name="ibuIstriTglLahir" value={data.ibuIstriTglLahir} onChange={handleChange} />
+                                                    <InputField label="Pekerjaan" name="ibuIstriKerja" value={data.ibuIstriKerja} onChange={handleChange} />
+                                                    <InputField label="Alamat" name="ibuIstriAlamat" value={data.ibuIstriAlamat} onChange={handleChange} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Proceed Button */}
+                                <div className="text-center pb-20 pt-4">
+                                    <button 
+                                        onClick={enterDocumentDashboard} 
+                                        className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white text-base font-bold py-4 px-12 rounded-2xl shadow-xl shadow-indigo-600/30 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-3 mx-auto"
+                                    >
+                                        <i className="ph ph-files text-2xl"></i> Simpan & Akses Dokumen Komplit (N1-N5)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="flex h-screen overflow-hidden bg-slate-950 text-slate-100">
+                    {/* Sidebar navigation */}
+                    <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col no-print z-20">
+                        <div className="p-6 text-center border-b border-slate-800 bg-slate-950/50">
+                            <div className="inline-flex w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-xl mb-3 border border-indigo-500/20 items-center justify-center overflow-hidden shadow-inner">
+                                {config.logoUrl ? (
+                                    <img src={config.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                                ) : (
+                                    <i className="ph ph-seal-check text-2xl"></i>
+                                )}
+                            </div>
+                            <h1 className="font-bold text-sm tracking-tight text-white leading-tight">SIM NA PREMIUM 2026<br/><span className="text-xs font-normal text-indigo-400">Desa {data.desa}</span></h1>
+                        </div>
+                        
+                        <div className="p-4 border-b border-slate-800">
+                            <button 
+                                onClick={() => setIsLoggedIn(false)}
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700/80 rounded-xl text-xs font-semibold transition-all border border-slate-700 text-slate-300 shadow-sm"
+                            >
+                                <i className="ph ph-pencil-simple text-base text-indigo-400"></i> Edit Data Input Form
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
+                            {tabs.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all text-xs font-semibold ${activeTab === tab.id ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}
+                                >
+                                    <i className={`ph ${tab.icon} text-lg ${activeTab === tab.id ? 'text-white' : 'text-indigo-400'}`}></i>
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Main workspace */}
+                    <div className="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
+                        <header className="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-6 no-print z-10 shrink-0">
+                            <div className="flex items-center gap-3">
+                                <h2 className="text-sm font-bold text-white tracking-wide uppercase flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    {tabs.find(t => t.id === activeTab)?.label}
+                                </h2>
+                                {data.jenisPemohon === 'P' && <span className="bg-pink-500/10 border border-pink-500/20 text-pink-300 text-[10px] px-2 py-0.5 rounded-full uppercase font-bold">Pihak Perempuan</span>}
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button onClick={handleDownloadPDF} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all">
+                                    <i className="ph ph-file-pdf text-base"></i> Unduh PDF
+                                </button>
+                                <button onClick={handlePrint} className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all">
+                                    <i className="ph ph-printer text-base"></i> Cetak Dokumen
+                                </button>
+                            </div>
+                        </header>
+
+                        <main className="flex-1 overflow-y-auto p-6 relative print:p-0 print:overflow-visible">
+                            
+                            {/* --- PENGATURAN --- */}
+                            {activeTab === 'pengaturan' && (
+                                <div className="max-w-3xl mx-auto space-y-6">
+                                    <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
+                                        <h3 className="text-lg font-black text-white border-b border-slate-800 pb-4 mb-6 flex items-center gap-3">
+                                            <i className="ph ph-gear text-indigo-400 text-2xl"></i> Pengaturan Sistem & Kredensial
+                                        </h3>
+                                        
+                                        <form onSubmit={saveConfig} className="space-y-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Username Login</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={settingsData.username} 
+                                                        onChange={e => setSettingsData({...settingsData, username: e.target.value})}
+                                                        className="w-full px-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 text-white text-sm"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kata Sandi Baru</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={settingsData.password} 
+                                                        onChange={e => setSettingsData({...settingsData, password: e.target.value})}
+                                                        className="w-full px-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 text-white text-sm"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="md:col-span-2">
+                                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Email Pemulihan (Untuk Lupa Sandi)</label>
+                                                    <input 
+                                                        type="email" 
+                                                        value={settingsData.email} 
+                                                        onChange={e => setSettingsData({...settingsData, email: e.target.value})}
+                                                        className="w-full px-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 text-white text-sm"
+                                                        placeholder="contoh@gmail.com"
+                                                    />
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="pt-4">
+                                                <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition-all">
+                                                    <i className="ph ph-floppy-disk text-lg"></i> Simpan Kredensial
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
+                                        <h3 className="text-lg font-black text-white border-b border-slate-800 pb-4 mb-6 flex items-center gap-3">
+                                            <i className="ph ph-image text-emerald-400 text-2xl"></i> Pengaturan Logo Aplikasi
+                                        </h3>
+                                        
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                                            <div className="w-24 h-24 rounded-2xl bg-slate-800 flex items-center justify-center border border-slate-700 overflow-hidden shrink-0">
+                                                {config.logoUrl ? (
+                                                    <img src={config.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <i className="ph ph-image text-3xl text-slate-500"></i>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 w-full">
+                                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Unggah Logo Baru</label>
+                                                <input 
+                                                    type="file" 
+                                                    accept="image/*"
+                                                    onChange={handleLogoUpload}
+                                                    className="w-full px-4 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20"
+                                                />
+                                                <p className="text-xs text-slate-500 mt-2">Gunakan format gambar JPG atau PNG. Rekomendasi rasio 1:1 (persegi).</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- MODEL N1 --- */}
+                            {activeTab === 'n1' && (
+                                <div className="a4-page print-only">
+                                    <div className="text-right mb-6 text-sm">
+                                        Lampiran V <br/>
+                                        Keputusan Dirjen Bimas Islam No 473 Tahun 2020
+                                    </div>
+                                    
+                                    <div className="text-center font-bold mb-6">
+                                        <h2 className="text-lg underline">FORMULIR SURAT PENGANTAR NIKAH</h2>
+                                        <p className="text-right font-normal">Model N 1</p>
+                                    </div>
+
+                                    <table className="mb-6">
+                                        <tbody>
+                                            <tr><td width="150">KANTOR DESA</td><td width="10">:</td><td>{data.desa}</td></tr>
+                                            <tr><td>KECAMATAN</td><td>:</td><td>{data.kecamatan}</td></tr>
+                                            <tr><td>KABUPATEN/KOTA</td><td>:</td><td>{data.kabupaten}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div className="text-center mb-6">
+                                        <h3 className="font-bold underline text-lg">PENGANTAR NIKAH</h3>
+                                        <p>Nomor : {data.nomorSurat}</p>
+                                    </div>
+
+                                    <p className="mb-4 text-justify">Yang bertanda tangan di bawah ini menjelaskan dengan sesungguhnya bahwa:</p>
+                                    
+                                    <table className="form-table w-full mb-4 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama</td><td>:</td><td className="font-bold">{pemohon.nama}</td></tr>
+                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{pemohon.nik}</td></tr>
+                                            <tr><td>3.</td><td>Jenis Kelamin</td><td>:</td><td>{pemohon.jk}</td></tr>
+                                            <tr><td>4.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{pemohon.tempatLahir}, {pemohon.tglLahir}</td></tr>
+                                            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>{pemohon.warga}</td></tr>
+                                            <tr><td>6.</td><td>Agama</td><td>:</td><td>{pemohon.agama}</td></tr>
+                                            <tr><td>7.</td><td>Pekerjaan</td><td>:</td><td>{pemohon.kerja}</td></tr>
+                                            <tr><td>8.</td><td>Alamat</td><td>:</td><td>{pemohon.alamat}</td></tr>
+                                            <tr><td className="align-top">9.</td><td className="align-top font-bold" colSpan="3">Status perkawinan</td></tr>
+                                            <tr><td></td><td>&nbsp;&nbsp;&nbsp;a. Laki-laki : Jejaka, Duda</td><td className="align-top">:</td><td className="align-top font-bold">{data.suamiStatus}</td></tr>
+                                            <tr><td></td><td>&nbsp;&nbsp;&nbsp;b. Perempuan : Perawan, Janda</td><td className="align-top">:</td><td className="align-top font-bold">{data.istriStatus}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-4 text-justify">Adalah benar anak dari perkawinan seorang pria:</p>
+                                    <table className="form-table w-full mb-4 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{ayahPemohon.nama}</td></tr>
+                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{ayahPemohon.nik}</td></tr>
+                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{ayahPemohon.tempatLahir}, {ayahPemohon.tglLahir}</td></tr>
+                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{ayahPemohon.warga}</td></tr>
+                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{ayahPemohon.agama}</td></tr>
+                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{ayahPemohon.kerja}</td></tr>
+                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{ayahPemohon.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-4 text-justify">dengan seorang wanita:</p>
+                                    <table className="form-table w-full mb-6 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{ibuPemohon.nama}</td></tr>
+                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{ibuPemohon.nik}</td></tr>
+                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{ibuPemohon.tempatLahir}, {ibuPemohon.tglLahir}</td></tr>
+                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{ibuPemohon.warga}</td></tr>
+                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{ibuPemohon.agama}</td></tr>
+                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{ibuPemohon.kerja}</td></tr>
+                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{ibuPemohon.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-10 text-justify">Demikian surat pengantar ini dibuat dengan mengingat sumpah jabatan dan untuk dipergunakan sebagaimana mestinya.</p>
+
+                                    <div className="signature-container">
+                                        <div className="text-center w-64">
+                                            <p>Pemohon</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{pemohon.nama}</p>
+                                        </div>
+                                        <div className="text-center w-64">
+                                            <p>{data.desa}, {data.tanggalSurat}</p>
+                                            <p>Kepala Desa/Kelurahan</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{data.kades}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- MODEL N2 --- */}
+                            {activeTab === 'n2' && (
+                                <div className="a4-page print-only">
+                                    <div className="text-right mb-6 text-sm">
+                                        Lampiran VI <br/>
+                                        Keputusan Dirjen Bimas Islam No 473 Tahun 2020
+                                    </div>
+                                    
+                                    <div className="text-center font-bold mb-6">
+                                        <h2 className="text-lg underline">FORMULIR PERMOHONAN KEHENDAK NIKAH</h2>
+                                        <p className="text-right font-normal">Model N 2</p>
+                                    </div>
+
+                                    <div className="flex justify-between mb-6">
+                                        <table className="w-1/2">
+                                            <tbody>
+                                                <tr><td width="60">Perihal</td><td width="10">:</td><td>Permohonan Kehendak Nikah</td></tr>
+                                            </tbody>
+                                        </table>
+                                        <div className="text-right">
+                                            {data.desa}, {data.tanggalSurat}
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-6">
+                                        <p>Kepada Yth.</p>
+                                        <p>Kepala KUA Kecamatan /PPN LN ........................................................</p>
+                                        <p>di Kecamatan {data.kecamatan}</p>
+                                    </div>
+
+                                    <p className="mb-4 text-justify">Dengan hormat, kami mengajukan permohonan kehendak nikah untuk atas nama :</p>
+                                    
+                                    <table className="w-full mb-6 ml-4">
+                                        <tbody>
+                                            <tr><td width="180">Calon suami</td><td width="10">:</td><td className="font-bold">{data.suamiNama}</td></tr>
+                                            <tr><td>Calon istri</td><td>:</td><td className="font-bold">{data.istriNama}</td></tr>
+                                            <tr><td>Hari /Tanggal/Jam</td><td>:</td><td>{data.waktuAkad}</td></tr>
+                                            <tr><td className="align-top">Tempat akad nikah</td><td className="align-top">:</td><td>{data.tempatAkad}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-4 text-justify">Bersama ini kami sampaikan surat-surat yang diperlukan untuk diperiksa sebagai berikut:</p>
+                                    <ol className="list-decimal pl-10 mb-10 space-y-1">
+                                        <li>Surat Pengantar nikah dari Desa/Kelurahan (N1)</li>
+                                        <li>Persetujuan Calon Mempelai (N4)</li>
+                                        <li>Fotokopi KTP Calon Mempelai, Wali, dan Saksi</li>
+                                        <li>Fotokopi Akta Kelahiran/Ijazah</li>
+                                        <li>Fotokopi Kartu Keluarga</li>
+                                        <li>Pasfoto 2x3 = 5 lembar, 3x4 = 2 lembar</li>
+                                    </ol>
+
+                                    <p className="mb-10 text-justify">Demikian permohonan ini kami sampaikan, kiranya dapat diperiksa dan dihadiri pada pelaksanaannya.</p>
+
+                                    <div className="signature-container">
+                                        <div className="text-center w-64">
+                                            <p>Diterima tanggal ........................</p>
+                                            <p>Kepala KUA Kecamatan/PPN LN</p>
+                                            <br/><br/><br/>
+                                            <p>....................................................</p>
+                                        </div>
+                                        <div className="text-center w-64">
+                                            <p>Wassalam,</p>
+                                            <p>Pemohon</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{pemohon.nama}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- MODEL N3 --- */}
+                            {activeTab === 'n3' && (
+                                <div className="a4-page print-only">
+                                    <div className="text-center font-bold mb-8 mt-10">
+                                        <h2 className="text-lg underline">SURAT PERSETUJUAN MEMPELAI</h2>
+                                        <p className="text-right font-normal">Model N 3</p>
+                                    </div>
+
+                                    <p className="mb-4 text-justify">Yang bertandatangan dibawah ini :</p>
+                                    
+                                    <p className="font-bold mb-2">A. Calon suami :</p>
+                                    <table className="form-table w-full mb-6 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama lengkap dan alias</td><td>:</td><td className="font-bold">{data.suamiNama}</td></tr>
+                                            <tr><td>2.</td><td>Bin</td><td>:</td><td>{data.ayahSuamiNama}</td></tr>
+                                            <tr><td>3.</td><td>Nomor induk kependudukan (NIK)</td><td>:</td><td>{data.suamiNik}</td></tr>
+                                            <tr><td>4.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{data.suamiTempatLahir}, {data.suamiTglLahir}</td></tr>
+                                            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>{data.suamiWarga}</td></tr>
+                                            <tr><td>6.</td><td>Agama</td><td>:</td><td>{data.suamiAgama}</td></tr>
+                                            <tr><td>7.</td><td>Pekerjaan</td><td>:</td><td>{data.suamiKerja}</td></tr>
+                                            <tr><td>8.</td><td>Alamat</td><td>:</td><td>{data.suamiAlamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="font-bold mb-2">B. Calon istri :</p>
+                                    <table className="form-table w-full mb-6 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama lengkap dan alias</td><td>:</td><td className="font-bold">{data.istriNama}</td></tr>
+                                            <tr><td>2.</td><td>Binti</td><td>:</td><td>{data.ayahIstriNama}</td></tr>
+                                            <tr><td>3.</td><td>Nomor induk kependudukan (NIK)</td><td>:</td><td>{data.istriNik}</td></tr>
+                                            <tr><td>4.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{data.istriTempatLahir}, {data.istriTglLahir}</td></tr>
+                                            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>{data.istriWarga}</td></tr>
+                                            <tr><td>6.</td><td>Agama</td><td>:</td><td>{data.istriAgama}</td></tr>
+                                            <tr><td>7.</td><td>Pekerjaan</td><td>:</td><td>{data.istriKerja}</td></tr>
+                                            <tr><td>8.</td><td>Alamat</td><td>:</td><td>{data.istriAlamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-10 text-justify">Menyatakan dengan sesungguhnya bahwa atas dasar sukarela, dengan kesadaran sendiri, tanpa paksaan dari siapapun juga, setuju untuk melangsungkan perkawinan.</p>
+                                    <p className="mb-10 text-justify">Demikian surat persetujuan ini di buat untuk digunakan seperlunya.</p>
+
+                                    <div className="signature-container">
+                                        <div className="text-center w-64">
+                                            <p>Calon Istri</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{data.istriNama}</p>
+                                        </div>
+                                        <div className="text-center w-64">
+                                            <p>{data.desa}, {data.tanggalSurat}</p>
+                                            <p>Calon Suami</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{data.suamiNama}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                             {/* --- MODEL N4 --- */}
+                             {activeTab === 'n4' && (
+                                <div className="a4-page print-only">
+                                    <div className="text-right mb-6 text-sm">
+                                        Lampiran VIII <br/>
+                                        Keputusan Dirjen Bimas Islam No 473 Tahun 2020
+                                    </div>
+                                    
+                                    <div className="text-center font-bold mb-6">
+                                        <h2 className="text-lg underline">FORMULIR PERSETUJUAN CALON PENGANTIN</h2>
+                                        <p className="text-right font-normal">Model N 4</p>
+                                    </div>
+
+                                    <div className="text-center mb-6">
+                                        <h3 className="font-bold underline text-lg">PERSETUJUAN CALON PENGANTIN</h3>
+                                    </div>
+
+                                    <p className="mb-4 text-justify">Yang bertanda tangan di bawah ini:</p>
+                                    
+                                    <p className="font-bold mb-2">A. Calon Suami:</p>
+                                    <table className="form-table w-full mb-6 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{data.suamiNama}</td></tr>
+                                            <tr><td>2.</td><td>Bin</td><td>:</td><td>{data.ayahSuamiNama}</td></tr>
+                                            <tr><td>3.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{data.suamiNik}</td></tr>
+                                            <tr><td>4.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{data.suamiTempatLahir}, {data.suamiTglLahir}</td></tr>
+                                            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>{data.suamiWarga}</td></tr>
+                                            <tr><td>6.</td><td>Agama</td><td>:</td><td>{data.suamiAgama}</td></tr>
+                                            <tr><td>7.</td><td>Pekerjaan</td><td>:</td><td>{data.suamiKerja}</td></tr>
+                                            <tr><td>8.</td><td>Alamat</td><td>:</td><td>{data.suamiAlamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="font-bold mb-2">B. Calon Istri:</p>
+                                    <table className="form-table w-full mb-6 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{data.istriNama}</td></tr>
+                                            <tr><td>2.</td><td>Binti</td><td>:</td><td>{data.ayahIstriNama}</td></tr>
+                                            <tr><td>3.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{data.istriNik}</td></tr>
+                                            <tr><td>4.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{data.istriTempatLahir}, {data.istriTglLahir}</td></tr>
+                                            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>{data.istriWarga}</td></tr>
+                                            <tr><td>6.</td><td>Agama</td><td>:</td><td>{data.istriAgama}</td></tr>
+                                            <tr><td>7.</td><td>Pekerjaan</td><td>:</td><td>{data.istriKerja}</td></tr>
+                                            <tr><td>8.</td><td>Alamat</td><td>:</td><td>{data.istriAlamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-10 text-justify">Menyatakan dengan sesungguhnya bahwa atas dasar sukarela, dengan kesadaran sendiri, tanpa paksaan dari siapapun juga, setuju untuk melangsungkan perkawinan.</p>
+                                    <p className="mb-10 text-justify">Demikian surat persetujuan ini di buat untuk digunakan seperlunya.</p>
+
+                                    <div className="signature-container">
+                                        <div className="text-center w-64">
+                                            <p>Calon Istri</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{data.istriNama}</p>
+                                        </div>
+                                        <div className="text-center w-64">
+                                            <p>{data.desa}, {data.tanggalSurat}</p>
+                                            <p>Calon Suami</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{data.suamiNama}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                             {/* --- MODEL N5 --- */}
+                             {activeTab === 'n5' && (
+                                <div className="a4-page print-only">
+                                    <div className="text-right mb-6 text-sm">
+                                        Lampiran IX <br/>
+                                        Keputusan Dirjen Bimas Islam No 473 Tahun 2020
+                                    </div>
+                                    
+                                    <div className="text-center font-bold mb-6">
+                                        <h2 className="text-lg underline">FORMULIR SURAT IZIN ORANG TUA</h2>
+                                        <p className="text-right font-normal">Model N 5</p>
+                                    </div>
+
+                                    <div className="text-center mb-6">
+                                        <h3 className="font-bold underline text-lg">SURAT IZIN ORANG TUA</h3>
+                                    </div>
+
+                                    <p className="mb-4 text-justify">Yang bertanda tangan di bawah ini:</p>
+                                    
+                                    <p className="font-bold mb-2">A.</p>
+                                    <table className="form-table w-full mb-4 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{ayahPemohon.nama}</td></tr>
+                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{ayahPemohon.nik}</td></tr>
+                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{ayahPemohon.tempatLahir}, {ayahPemohon.tglLahir}</td></tr>
+                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{ayahPemohon.warga}</td></tr>
+                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{ayahPemohon.agama}</td></tr>
+                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{ayahPemohon.kerja}</td></tr>
+                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{ayahPemohon.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="font-bold mb-2">B.</p>
+                                    <table className="form-table w-full mb-6 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{ibuPemohon.nama}</td></tr>
+                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{ibuPemohon.nik}</td></tr>
+                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{ibuPemohon.tempatLahir}, {ibuPemohon.tglLahir}</td></tr>
+                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{ibuPemohon.warga}</td></tr>
+                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{ibuPemohon.agama}</td></tr>
+                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{ibuPemohon.kerja}</td></tr>
+                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{ibuPemohon.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-4 text-justify">Adalah ayah kandung dan ibu kandung/wali/pengampu dari:</p>
+                                    <table className="form-table w-full mb-6 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{pemohon.nama}</td></tr>
+                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{pemohon.nik}</td></tr>
+                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{pemohon.tempatLahir}, {pemohon.tglLahir}</td></tr>
+                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{pemohon.warga}</td></tr>
+                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{pemohon.agama}</td></tr>
+                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{pemohon.kerja}</td></tr>
+                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{pemohon.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-6 text-justify">Memberikan izin kepada anak kami untuk melangsungkan perkawinan dengan:</p>
+                                    
+                                    <table className="form-table w-full mb-6 ml-4">
+                                        <tbody>
+                                            <tr><td>1.</td><td>Nama Lengkap dan alias</td><td>:</td><td className="font-bold">{pasangan.nama}</td></tr>
+                                            <tr><td>2.</td><td>Nomor Induk Kependudukan</td><td>:</td><td>{pasangan.nik}</td></tr>
+                                            <tr><td>3.</td><td>Tempat dan tanggal lahir</td><td>:</td><td>{pasangan.tempatLahir}, {pasangan.tglLahir}</td></tr>
+                                            <tr><td>4.</td><td>Kewarganegaraan</td><td>:</td><td>{pasangan.warga}</td></tr>
+                                            <tr><td>5.</td><td>Agama</td><td>:</td><td>{pasangan.agama}</td></tr>
+                                            <tr><td>6.</td><td>Pekerjaan</td><td>:</td><td>{pasangan.kerja}</td></tr>
+                                            <tr><td>7.</td><td>Alamat</td><td>:</td><td>{pasangan.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <p className="mb-6 text-justify">Demikian surat izin ini dibuat dengan kesadaran tanpa ada paksaan dari pihak manapun dan untuk digunakan seperlunya.</p>
+
+                                    <div className="signature-container">
+                                        <div className="text-center w-64">
+                                            <p>Ibu/Wali/Pengampu</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{ibuPemohon.nama}</p>
+                                        </div>
+                                        <div className="text-center w-64">
+                                            <p>{data.desa}, {data.tanggalSurat}</p>
+                                            <p>Ayah/Wali/Pengampu</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{ayahPemohon.nama}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                             {/* --- REKOMENDASI NIKAH --- */}
+                             {activeTab === 'rekomendasi' && (
+                                <div className="a4-page print-only">
+                                    <div className="kop-surat">
+                                        <div className="print-logo-box">
+                                            {config.logoUrl && <img src={config.logoUrl} alt="Logo Desa" />}
+                                        </div>
+                                        <div className="print-title-box">
+                                            <h3>PEMERINTAH KABUPATEN {data.kabupaten}</h3>
+                                            <h2>KECAMATAN {data.kecamatan}</h2>
+                                            <h1>DESA {data.desa}</h1>
+                                            <p>Alamat : Jl. Desa {data.desa} Kecamatan {data.kecamatan} Kabupaten {data.kabupaten} Kode Pos : {data.kodepos}</p>
+                                        </div>
+                                        <div className="print-logo-spacer"></div>
+                                    </div>
+
+                                    <div className="flex justify-between mb-4">
+                                        <table className="w-2/3">
+                                            <tbody>
+                                                <tr><td width="90">Nomor</td><td width="10">:</td><td>{data.nomorSurat}</td></tr>
+                                                <tr><td>Sifat</td><td>:</td><td>Biasa</td></tr>
+                                                <tr><td>Lampiran</td><td>:</td><td>1 (satu) berkas</td></tr>
+                                                <tr><td className="align-top">Hal</td><td className="align-top">:</td><td><strong>Rekomendasi Nikah</strong></td></tr>
+                                            </tbody>
+                                        </table>
+                                        <div className="text-right">
+                                            {data.kecamatan}, {data.tanggalSurat}
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <p>Kepada Yth,</p>
+                                        <p>Kepala KUA Kecamatan / PPN LN</p>
+                                        <p className="font-bold uppercase">{data.kuaTujuan}</p>
+                                        <p>di tempat</p>
+                                    </div>
+
+                                    <p className="mb-3 text-justify">Berdasarkan surat keterangan dari Kepala Desa/Kelurahan {data.desa} Nomor: {data.nomorSurat} Tanggal {data.tanggalSurat}, dengan ini menerangkan bahwa:</p>
+                                    
+                                    <table className="w-full mb-3 ml-6">
+                                        <tbody>
+                                            <tr><td width="190" className="py-1">1. Nama</td><td width="10">:</td><td className="font-bold py-1">{pemohon.nama}</td></tr>
+                                            <tr><td className="py-1">2. {pemohon.binBintiLabel}</td><td>:</td><td className="py-1">{pemohon.binBintiName}</td></tr>
+                                            <tr><td className="py-1">3. Nomor Induk Kependudukan</td><td>:</td><td className="py-1">{pemohon.nik}</td></tr>
+                                            <tr><td className="py-1">4. Tempat, tanggal lahir</td><td>:</td><td className="py-1">{pemohon.tempatLahir}, {pemohon.tglLahir}</td></tr>
+                                            <tr><td className="py-1">5. Jenis Kelamin</td><td>:</td><td className="py-1">{pemohon.jk}</td></tr>
+                                            <tr><td className="py-1">6. Kewarganegaraan</td><td>:</td><td className="py-1">{pemohon.warga}</td></tr>
+                                            <tr><td className="py-1">7. Agama</td><td>:</td><td className="py-1">{pemohon.agama}</td></tr>
+                                            <tr><td className="py-1">8. Pekerjaan</td><td>:</td><td className="py-1">{pemohon.kerja}</td></tr>
+                                            <tr><td className="py-1 align-top">9. Alamat</td><td className="align-top">:</td><td className="py-1">{pemohon.alamat}</td></tr>
+                                            <tr><td className="py-1">10. Status Perkawinan</td><td>:</td><td className="py-1">{pemohon.status}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-2 text-justify">bermaksud akan melangsungkan perkawinan dengan seorang {pasangan.jk === 'LAKI-LAKI' ? 'laki-laki' : 'perempuan'}:</p>
+
+                                    <table className="w-full mb-4 ml-6">
+                                        <tbody>
+                                            <tr><td width="190" className="py-1">1. Nama</td><td width="10">:</td><td className="font-bold py-1">{pasangan.nama}</td></tr>
+                                            <tr><td className="py-1">2. {pasangan.binBintiLabel}</td><td>:</td><td className="py-1">{pasangan.binBintiName}</td></tr>
+                                            <tr><td className="py-1">3. Nomor Induk Kependudukan</td><td>:</td><td className="py-1">{pasangan.nik}</td></tr>
+                                            <tr><td className="py-1">4. Tempat, tanggal lahir</td><td>:</td><td className="py-1">{pasangan.tempatLahir}, {pasangan.tglLahir}</td></tr>
+                                            <tr><td className="py-1">5. Agama</td><td>:</td><td className="py-1">{pasangan.agama}</td></tr>
+                                            <tr><td className="py-1">6. Pekerjaan</td><td>:</td><td className="py-1">{pasangan.kerja}</td></tr>
+                                            <tr><td className="py-1 align-top">7. Alamat</td><td className="align-top">:</td><td className="py-1">{pasangan.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-4 text-justify">Berdasarkan persyaratan yang telah ditentukan dalam Undang-Undang Nomor 1 Tahun 1974 tentang Perkawinan jo. Undang-Undang Nomor 16 Tahun 2019, tidak terdapat halangan untuk melangsungkan perkawinan.</p>
+                                    <p className="mb-6 text-justify">Demikian surat rekomendasi ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
+
+                                    <div className="signature-container">
+                                        <div className="text-center w-64">
+                                            <p>Pemohon</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{pemohon.nama}</p>
+                                        </div>
+                                        <div className="text-center w-80">
+                                            <p>Kepala KUA Kecamatan {data.kecamatan}</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold uppercase">( ................................................... )</p>
+                                            <p>NIP. .........................................</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                             {/* --- NUMPANG NIKAH --- */}
+                             {activeTab === 'numpang' && (
+                                <div className="a4-page print-only">
+                                    <div className="kop-surat">
+                                        <div className="print-logo-box">
+                                            {config.logoUrl && <img src={config.logoUrl} alt="Logo Desa" />}
+                                        </div>
+                                        <div className="print-title-box">
+                                            <h3>PEMERINTAH KABUPATEN {data.kabupaten}</h3>
+                                            <h2>KECAMATAN {data.kecamatan}</h2>
+                                            <h1>DESA {data.desa}</h1>
+                                            <p>Alamat : Jl. Desa {data.desa} Kecamatan {data.kecamatan} Kabupaten {data.kabupaten} Kode Pos : {data.kodepos}</p>
+                                        </div>
+                                        <div className="print-logo-spacer"></div>
+                                    </div>
+
+                                    <div className="text-center mb-6">
+                                        <h3 className="font-bold underline text-xl">SURAT KETERANGAN NUMPANG NIKAH</h3>
+                                        <p>Nomor: {data.nomorSurat}</p>
+                                    </div>
+
+                                    <p className="mb-4 text-justify">Yang bertanda tangan di bawah ini Kepala desa {data.desa} Kecamatan {data.kecamatan} Kabupaten {data.kabupaten} menerangkan bahwa :</p>
+                                    
+                                    <table className="w-full mb-4 ml-6">
+                                        <tbody>
+                                            <tr><td width="190" className="py-1">Nama</td><td width="10">:</td><td className="font-bold py-1">{pemohon.nama}</td></tr>
+                                            <tr><td className="py-1">{pemohon.binBintiLabel}</td><td>:</td><td className="py-1">{pemohon.binBintiName}</td></tr>
+                                            <tr><td className="py-1">Tempat Tgl lahir</td><td>:</td><td className="py-1">{pemohon.tempatLahir}, {pemohon.tglLahir}</td></tr>
+                                            <tr><td className="py-1">Jenis kelamin</td><td>:</td><td className="py-1">{pemohon.jk}</td></tr>
+                                            <tr><td className="py-1">Kewarganegaraan</td><td>:</td><td className="py-1">{pemohon.warga}</td></tr>
+                                            <tr><td className="py-1">Agama</td><td>:</td><td className="py-1">{pemohon.agama}</td></tr>
+                                            <tr><td className="py-1">Pekerjaan</td><td>:</td><td className="py-1">{pemohon.kerja}</td></tr>
+                                            <tr><td className="py-1 align-top">Alamat</td><td className="align-top">:</td><td className="py-1">{pemohon.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table className="w-full mb-4 ml-6">
+                                        <tbody>
+                                            <tr><td width="190" className="py-1">Tujuan</td><td width="10">:</td><td className="font-bold py-1">{data.tempatAkad}</td></tr>
+                                            <tr><td className="py-1">Keperluan</td><td>:</td><td className="font-bold py-1">Numpang Nikah</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-6 text-justify">Orang tersebut benar warga/penduduk desa {data.desa} menurut sepengetahuan kami berkelakuan baik belum pernah terlibat urusaan polisi dan surat ini diberikan kepadanya untuk keperluan mengurus Numpang Nikah.</p>
+                                    
+                                    <p className="mb-6 text-justify">Demikian Surat Keterangan Numpang Nikah ini kami buat agar dapat dipergunakan seperlunya.</p>
+
+                                    <div className="signature-container">
+                                        <div className="text-center w-64">
+                                            <p>Pemohon</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{pemohon.nama}</p>
+                                        </div>
+                                        <div className="text-center w-64">
+                                            <p>{data.desa}, {data.tanggalSurat}</p>
+                                            <p>Kepala Desa {data.desa}</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{data.kades}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                             {/* --- KETERANGAN BELUM MENIKAH --- */}
+                             {activeTab === 'belum_nikah' && (
+                                <div className="a4-page print-only">
+                                    <div className="text-center mb-8 mt-10">
+                                        <h3 className="font-bold underline text-xl">SURAT PERNYATAAN BELUM MENIKAH</h3>
+                                    </div>
+
+                                    <p className="mb-6 text-justify">Yang bertanda tangan di bawah ini,</p>
+                                    
+                                    <table className="w-full mb-6 ml-8">
+                                        <tbody>
+                                            <tr><td width="220" className="py-1">Nama lengkap</td><td width="10">:</td><td className="font-bold py-1">{pemohon.nama}</td></tr>
+                                            <tr><td className="py-1">{pemohon.binBintiLabel}</td><td>:</td><td className="py-1">{pemohon.binBintiName}</td></tr>
+                                            <tr><td className="py-1">Nomor Induk Kependudukan</td><td>:</td><td className="py-1">{pemohon.nik}</td></tr>
+                                            <tr><td className="py-1">Tempat, tanggal lahir</td><td>:</td><td className="py-1">{pemohon.tempatLahir}, {pemohon.tglLahir}</td></tr>
+                                            <tr><td className="py-1">Warga Negara</td><td>:</td><td className="py-1">{pemohon.warga}</td></tr>
+                                            <tr><td className="py-1">Agama</td><td>:</td><td className="py-1">{pemohon.agama}</td></tr>
+                                            <tr><td className="py-1">Pekerjaan</td><td>:</td><td className="py-1">{pemohon.kerja}</td></tr>
+                                            <tr><td className="py-1 align-top">Alamat</td><td className="align-top">:</td><td className="py-1">{pemohon.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-4 text-justify">Menyatakan dengan sebenarnya dan sanggup di angkat sumpah bahwa :</p>
+                                    
+                                    <ol className="list-decimal pl-12 mb-6 space-y-2 text-justify">
+                                        <li>Sampai dengan saat ini benar-benar belum menikah dengan siapapun</li>
+                                        <li>Dengan demikian sampai dengan saat ini saya masih berstatus {pemohon.status}.</li>
+                                    </ol>
+
+                                    <p className="mb-6 text-justify">Surat pernyataan ini saya buat untuk memenuhi kelengkapan persyaratan pelaksanaan nikah Dengan :</p>
+
+                                    <table className="w-full mb-10 ml-8">
+                                        <tbody>
+                                            <tr><td width="220" className="py-1">1. Nama</td><td width="10">:</td><td className="font-bold py-1">{pasangan.nama}</td></tr>
+                                            <tr><td className="py-1">2. {pasangan.binBintiLabel}</td><td>:</td><td className="py-1">{pasangan.binBintiName}</td></tr>
+                                            <tr><td className="py-1">3. Nomor Induk Kependudukan</td><td>:</td><td className="py-1">{pasangan.nik}</td></tr>
+                                            <tr><td className="py-1">4. Tempat, tanggal lahir</td><td>:</td><td className="py-1">{pasangan.tempatLahir}, {pasangan.tglLahir}</td></tr>
+                                            <tr><td className="py-1">5. Warga negara</td><td>:</td><td className="py-1">{pasangan.warga}</td></tr>
+                                            <tr><td className="py-1">6. Agama</td><td>:</td><td className="py-1">{pasangan.agama}</td></tr>
+                                            <tr><td className="py-1">7. Pekerjaan</td><td>:</td><td className="py-1">{pasangan.kerja}</td></tr>
+                                            <tr><td className="py-1 align-top">8. Alamat</td><td className="align-top">:</td><td className="py-1">{pasangan.alamat}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div className="signature-container">
+                                        <div className="text-center w-64">
+                                            <p>Mengetahui,</p>
+                                            <p>Kepala Desa/Kelurahan</p>
+                                            <br/><br/><br/>
+                                            <p className="font-bold underline">{data.kades}</p>
+                                        </div>
+                                        <div className="text-center w-64">
+                                            <p>{data.desa}, {data.tanggalSurat}</p>
+                                            <p>Yang Membuat Pernyataan</p>
+                                            <p className="text-xs text-gray-500 italic">(Materai 10.000)</p>
+                                            <br/><br/>
+                                            <p className="font-bold underline">{pemohon.nama}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                        </main>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
