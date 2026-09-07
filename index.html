@@ -236,211 +236,99 @@
                 googleSheetUrl: ''
             });
 
+            // Semua nilai form dikosongkan secara default agar bersih saat aplikasi dibuka
             const [data, setData] = useState({
                 jenisPemohon: 'L',
-                nomorSurat: '400/       /06.2005/MSJ/VI/2026',
-                tanggalSurat: '17-06-2026',
-                kades: 'KEPALA DESA FAJAR ASRI',
-                kabupaten: 'MESUJI',
-                kecamatan: 'PANCA JAYA',
-                desa: 'FAJAR ASRI',
-                kodepos: '34698',
-                provinsi: 'LAMPUNG',
-                waktuAkad: '08.00 s/d Selesai',
-                tempatAkad: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kec. Maos Kab. Cilacap',
-                kuaTujuan: 'KECAMATAN MAOS KABUPATEN CILACAP',
+                nomorSurat: '',
+                tanggalSurat: '',
+                kades: '',
+                kabupaten: '',
+                kecamatan: '',
+                desa: '',
+                kodepos: '',
+                provinsi: '',
+                waktuAkad: '',
+                tempatAkad: '',
+                kuaTujuan: '',
 
-                suamiNama: 'RUDI ANTO',
-                suamiNik: '1811060808020001',
-                suamiTempatLahir: 'LAMPUNG UTARA',
-                suamiTglLahir: '08-07-2002',
-                suamiWarga: 'INDONESIA',
-                suamiAgama: 'ISLAM',
-                suamiKerja: 'WIRASWASTA',
-                suamiAlamat: 'Desa Fajar Asri Rt/Rw 006/002 Kecamatan Panca Jaya Kabupaten Mesuji',
-                suamiStatus: 'JEJAKA',
+                suamiNama: '',
+                suamiNik: '',
+                suamiTempatLahir: '',
+                suamiTglLahir: '',
+                suamiWarga: '',
+                suamiAgama: '',
+                suamiKerja: '',
+                suamiAlamat: '',
+                suamiStatus: '',
                 
-                ayahSuamiNama: 'DARSIMAN',
-                ayahSuamiBin: 'KAKEK SUAMI',
-                ayahSuamiNik: '1811060706790002',
-                ayahSuamiTempatLahir: 'LAMPUNG TENGAH',
-                ayahSuamiTglLahir: '07-08-1979',
-                ayahSuamiWarga: 'INDONESIA',
-                ayahSuamiAgama: 'ISLAM',
-                ayahSuamiKerja: 'PETANI/PEKEBUN',
-                ayahSuamiAlamat: 'Desa Fajar Asri Rt/Rw 006/002 Kecamatan Panca Jaya Kabupaten Mesuji',
+                ayahSuamiNama: '',
+                ayahSuamiBin: '',
+                ayahSuamiNik: '',
+                ayahSuamiTempatLahir: '',
+                ayahSuamiTglLahir: '',
+                ayahSuamiWarga: '',
+                ayahSuamiAgama: '',
+                ayahSuamiKerja: '',
+                ayahSuamiAlamat: '',
 
-                ibuSuamiNama: 'SITI MARHAMAH',
-                ibuSuamiBinti: 'NENEK SUAMI',
-                ibuSuamiNik: '1811064910820001',
-                ibuSuamiTempatLahir: 'LAMPUNG SELATAN',
-                ibuSuamiTglLahir: '09-10-1982',
-                ibuSuamiWarga: 'INDONESIA',
-                ibuSuamiAgama: 'ISLAM',
-                ibuSuamiKerja: 'BURUH TANI/PEKEBUN',
-                ibuSuamiAlamat: 'Desa Fajar Asri Rt/Rw 006/002 Kecamatan Panca Jaya Kabupaten Mesuji',
+                ibuSuamiNama: '',
+                ibuSuamiBinti: '',
+                ibuSuamiNik: '',
+                ibuSuamiTempatLahir: '',
+                ibuSuamiTglLahir: '',
+                ibuSuamiWarga: '',
+                ibuSuamiAgama: '',
+                ibuSuamiKerja: '',
+                ibuSuamiAlamat: '',
 
-                istriNama: 'MERI JUNIATI',
-                istriNik: '3301074706990001',
-                istriTempatLahir: 'CILACAP',
-                istriTglLahir: '13-06-1999',
-                istriWarga: 'INDONESIA',
-                istriAgama: 'ISLAM',
-                istriKerja: 'MENGURUS RUMAH TANGGA',
-                istriAlamat: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kecamatan Maos',
-                istriStatus: 'PERAWAN',
+                istriNama: '',
+                istriNik: '',
+                istriTempatLahir: '',
+                istriTglLahir: '',
+                istriWarga: '',
+                istriAgama: '',
+                istriKerja: '',
+                istriAlamat: '',
+                istriStatus: '',
                 
-                ayahIstriNama: 'MARYONO',
-                ayahIstriBin: 'KAKEK ISTRI',
-                ayahIstriNik: '3301070101700001',
-                ayahIstriTempatLahir: 'CILACAP',
-                ayahIstriTglLahir: '01-01-1970',
-                ayahIstriWarga: 'INDONESIA',
-                ayahIstriAgama: 'ISLAM',
-                ayahIstriKerja: 'PETANI/PEKEBUN',
-                ayahIstriAlamat: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kecamatan Maos',
+                ayahIstriNama: '',
+                ayahIstriBin: '',
+                ayahIstriNik: '',
+                ayahIstriTempatLahir: '',
+                ayahIstriTglLahir: '',
+                ayahIstriWarga: '',
+                ayahIstriAgama: '',
+                ayahIstriKerja: '',
+                ayahIstriAlamat: '',
 
-                ibuIstriNama: 'SULASTRI',
-                ibuIstriBinti: 'NENEK ISTRI',
-                ibuIstriNik: '3301070202750001',
-                ibuIstriTempatLahir: 'CILACAP',
-                ibuIstriTglLahir: '02-02-1975',
-                ibuIstriWarga: 'INDONESIA',
-                ibuIstriAgama: 'ISLAM',
-                ibuIstriKerja: 'MENGURUS RUMAH TANGGA',
-                ibuIstriAlamat: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kecamatan Maos'
+                ibuIstriNama: '',
+                ibuIstriBinti: '',
+                ibuIstriNik: '',
+                ibuIstriTempatLahir: '',
+                ibuIstriTglLahir: '',
+                ibuIstriWarga: '',
+                ibuIstriAgama: '',
+                ibuIstriKerja: '',
+                ibuIstriAlamat: ''
             });
 
-            // =========================================================================
-            // FUNGSI GOOGLE SHEETS (DIPERBARUI UNTUK RIWAYAT KESELURUHAN)
-            // =========================================================================
-            const syncToGoogleSheet = async (profilesToSync = savedProfiles, showMsg = true) => {
-                if (!config.googleSheetUrl) return; // Silent return if no URL
-                setIsSyncing(true);
-                try {
-                    const response = await fetch(config.googleSheetUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'text/plain;charset=utf-8', 
-                        },
-                        body: JSON.stringify({ action: 'sync_all', profiles: profilesToSync })
-                    });
-                    const result = await response.json();
-                    if(result.status === 'success') {
-                        if(showMsg) showNotification("Berhasil tersinkronisasi ke Google Sheet!");
-                    } else {
-                        throw new Error("Respon server tidak sukses");
-                    }
-                } catch (error) {
-                    console.error("GSheet Sync Error:", error);
-                    if(showMsg) showNotification("Gagal sinkronisasi ke GSheet.", "error");
-                } finally {
-                    setIsSyncing(false);
-                }
-            };
-
-            const fetchFromGoogleSheet = async (url = config.googleSheetUrl, showMsg = true) => {
-                if (!url) {
-                    if(showMsg) showNotification("URL Google Sheet belum diatur!", "error");
-                    return;
-                }
-                setIsSyncing(true);
-                try {
-                    const response = await fetch(`${url}?action=get_all`);
-                    const result = await response.json();
-                    if (result && result.status === 'success') {
-                        // Memperbarui daftar riwayat dari sheet
-                        const incomingData = Array.isArray(result.data) ? result.data : [];
-                        setSavedProfiles(incomingData);
-                        localStorage.setItem('sim_na_premium_saved', JSON.stringify(incomingData));
-                        if(showMsg) showNotification("Data riwayat berhasil ditarik & diperbarui dari Google Sheet!");
-                    }
-                } catch (error) {
-                    console.error("GSheet Fetch Error:", error);
-                    if(showMsg) showNotification("Gagal mengambil data. Pastikan URL Apps Script benar.", "error");
-                } finally {
-                    setIsSyncing(false);
-                }
-            };
-
-            const getGoogleScriptTemplate = () => {
-                return `function doGet(e) {
-  if (e.parameter.action === 'get_all') {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var lastRow = sheet.getLastRow();
-    var lastCol = sheet.getLastColumn();
-
-    if (lastRow < 2) {
-      return ContentService.createTextOutput(JSON.stringify({status: 'success', data: []})).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-    var dataRange = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
-
-    var profiles = [];
-    for (var i = 0; i < dataRange.length; i++) {
-      var row = dataRange[i];
-      var profile = { data: {} };
-      for (var j = 0; j < headers.length; j++) {
-        if (headers[j] === '_id') profile.id = row[j];
-        else if (headers[j] === '_date') profile.date = row[j];
-        else if (headers[j] === '_label') profile.label = row[j];
-        else profile.data[headers[j]] = row[j];
-      }
-      profiles.push(profile);
-    }
-    return ContentService.createTextOutput(JSON.stringify({status: 'success', data: profiles})).setMimeType(ContentService.MimeType.JSON);
-  }
-  return ContentService.createTextOutput("GSheet API Ready - Gunakan parameter ?action=get_all");
-}
-
-function doPost(e) {
-  var parsedData = JSON.parse(e.postData.contents);
-  if (parsedData.action === 'sync_all') {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var profiles = parsedData.profiles;
-
-    sheet.clear(); // Bersihkan sheet lama agar sesuai dengan daftar baru (termasuk penghapusan)
-
-    if (!profiles || profiles.length === 0) {
-        return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    // Buat Headers dari data pertama
-    var firstData = profiles[0].data || {};
-    var dataHeaders = Object.keys(firstData);
-    var fullHeaders = ['_id', '_date', '_label'].concat(dataHeaders);
-    sheet.appendRow(fullHeaders);
-
-    // Masukkan semua baris data
-    var rows = [];
-    for (var i = 0; i < profiles.length; i++) {
-        var p = profiles[i];
-        var row = [p.id, p.date, p.label];
-        for (var j = 0; j < dataHeaders.length; j++) {
-            row.push(p.data[dataHeaders[j]] || "");
-        }
-        rows.push(row);
-    }
-
-    if (rows.length > 0) {
-       sheet.getRange(2, 1, rows.length, fullHeaders.length).setValues(rows);
-    }
-
-    return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
-  }
-}`;
-            };
-            // =========================================================================
-
             useEffect(() => {
-                let initialUrl = '';
+                const saved = localStorage.getItem('sim_na_premium_saved');
+                if (saved) {
+                    try {
+                        setSavedProfiles(JSON.parse(saved));
+                    } catch (e) {
+                        console.error("Gagal memuat data", e);
+                    }
+                }
+
                 const savedConfig = localStorage.getItem('sim_na_config');
+                let loadedConfig = config;
                 if (savedConfig) {
                     try {
                         const parsed = JSON.parse(savedConfig);
                         setConfig(parsed);
-                        initialUrl = parsed.googleSheetUrl;
+                        loadedConfig = parsed;
                         setSettingsData({
                             username: parsed.username,
                             password: parsed.password,
@@ -458,38 +346,93 @@ function doPost(e) {
                         googleSheetUrl: ''
                     });
                 }
-
-                // Coba muat riwayat lokal dulu agar UI tidak kosong
-                const saved = localStorage.getItem('sim_na_premium_saved');
-                if (saved) {
-                    try { setSavedProfiles(JSON.parse(saved)); } catch (e) {}
-                }
-
-                // Otomatis tarik data dari Sheet jika URL ada (Menggantikan data lokal jika ada beda)
-                if (initialUrl) {
-                    fetchFromGoogleSheet(initialUrl, false); 
-                }
             }, []);
+            
+            // Auto-fetch data when logged in
+            useEffect(() => {
+                if (isLoggedIn && config.googleSheetUrl) {
+                    fetchFromGoogleSheet(config.googleSheetUrl, false);
+                }
+            }, [isLoggedIn, config.googleSheetUrl]);
 
             const showNotification = (msg, type = 'success') => {
                 setNotification({ message: msg, type });
                 setTimeout(() => setNotification(null), 3500);
             };
 
+            const syncAllToSheet = async (profilesData, url = config.googleSheetUrl) => {
+                if (!url) return;
+                setIsSyncing(true);
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'sync_all', profiles: profilesData })
+                    });
+                    const result = await response.json();
+                    if(result.status !== 'success') {
+                         console.warn("GSheet Sync Warning:", result);
+                    }
+                } catch (error) {
+                    console.error("GSheet Sync Error:", error);
+                } finally {
+                    setIsSyncing(false);
+                }
+            };
+
+            const fetchFromGoogleSheet = async (url = config.googleSheetUrl, showMsg = true) => {
+                if (!url) {
+                    if(showMsg) showNotification("URL Google Sheet belum diatur!", "error");
+                    return;
+                }
+                setIsSyncing(true);
+                try {
+                    const response = await fetch(`${url}?action=get_all`);
+                    const result = await response.json();
+                    if (result && result.status === 'success') {
+                        // Memperbarui daftar riwayat dari sheet dan menyaring format tanggal
+                        const incomingData = Array.isArray(result.data) ? result.data.map(profile => {
+                            const sanitizedData = {};
+                            for (const key in profile.data) {
+                                let val = profile.data[key];
+                                // Mencegah format tanggal rusak (ISO string) jika Sheet mengkonversi otomatis
+                                if (typeof val === 'string' && val.includes('T') && val.includes('Z') && val.length >= 20) {
+                                    const d = new Date(val);
+                                    if(!isNaN(d.getTime())) {
+                                        val = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+                                    }
+                                }
+                                sanitizedData[key] = val;
+                            }
+                            return { ...profile, data: sanitizedData };
+                        }) : [];
+                        
+                        setSavedProfiles(incomingData);
+                        localStorage.setItem('sim_na_premium_saved', JSON.stringify(incomingData));
+                        if(showMsg) showNotification("Data riwayat berhasil ditarik & diperbarui dari Google Sheet!");
+                    }
+                } catch (error) {
+                    console.error("GSheet Fetch Error:", error);
+                    if(showMsg) showNotification("Gagal mengambil data dari Sheet. Periksa koneksi atau URL.", "error");
+                } finally {
+                    setIsSyncing(false);
+                }
+            };
+
             const saveCurrentData = () => {
                 const newProfile = {
-                    id: Date.now().toString(), // Pastikan ID berupa string agar kompatibel dengan Sheets
+                    id: Date.now(),
                     date: new Date().toLocaleString('id-ID'),
                     label: `${data.suamiNama || 'Suami'} & ${data.istriNama || 'Istri'} (${data.jenisPemohon === 'L' ? 'Laki-laki' : 'Perempuan'})`,
                     data: { ...data }
                 };
-                const updatedProfiles = [newProfile, ...savedProfiles].slice(0, 50); // Batasi 50 riwayat
+                const updatedProfiles = [newProfile, ...savedProfiles].slice(0, 50); // Maks 50 draft
                 setSavedProfiles(updatedProfiles);
                 localStorage.setItem('sim_na_premium_saved', JSON.stringify(updatedProfiles));
-                showNotification('Draft disimpan! Melakukan sinkronisasi...');
+                showNotification('Draft berhasil disimpan ke lokal & tersinkronisasi ke Cloud!');
                 
-                // Otomatis Push ke Sheet
-                syncToGoogleSheet(updatedProfiles, false);
+                // Auto trigger sync
+                syncAllToSheet(updatedProfiles);
             };
 
             const loadData = (profile) => {
@@ -501,10 +444,10 @@ function doPost(e) {
                 const updated = savedProfiles.filter(p => p.id !== id);
                 setSavedProfiles(updated);
                 localStorage.setItem('sim_na_premium_saved', JSON.stringify(updated));
-                showNotification('Draft dihapus secara lokal dan awan.', 'error');
+                showNotification('Draft berhasil dihapus dari sistem & Cloud.', 'error');
                 
-                // Otomatis Push ke Sheet (Karena data dihapus, sheet akan diperbarui dengan data yg sudah berkurang)
-                syncToGoogleSheet(updated, false);
+                // Auto trigger sync delete
+                syncAllToSheet(updated);
             };
 
             const handleLogin = (e) => {
@@ -524,6 +467,91 @@ function doPost(e) {
                 setConfig(newConfig);
                 localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
                 showNotification('Pengaturan berhasil disimpan!');
+            };
+
+            const getGoogleScriptTemplate = () => {
+                return `function doGet(e) {
+  // Menangani fungsi Tarik Data (Fetch/Refresh)
+  if (e.parameter.action === 'get_all') {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var lastRow = sheet.getLastRow();
+    var lastCol = sheet.getLastColumn();
+
+    if (lastRow < 2) {
+      return ContentService.createTextOutput(JSON.stringify({status: 'success', data: []}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    // getDisplayValues agar teks dan tanggal tidak diubah sistem
+    var dataRange = sheet.getRange(2, 1, lastRow - 1, lastCol).getDisplayValues(); 
+
+    var profiles = [];
+    for (var i = 0; i < dataRange.length; i++) {
+      var row = dataRange[i];
+      var profile = { data: {} };
+      
+      for (var j = 0; j < headers.length; j++) {
+        if (headers[j] === '_id') profile.id = row[j].toString();
+        else if (headers[j] === '_date') profile.date = row[j];
+        else if (headers[j] === '_label') profile.label = row[j];
+        else profile.data[headers[j]] = row[j];
+      }
+      profiles.push(profile);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({status: 'success', data: profiles}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  return ContentService.createTextOutput("GSheet API Ready - Gunakan parameter ?action=get_all");
+}
+
+function doPost(e) {
+  // Menangani fungsi Simpan dan Hapus Massal (Auto-Sync)
+  var parsedData = JSON.parse(e.postData.contents);
+  
+  if (parsedData.action === 'sync_all') {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var profiles = parsedData.profiles;
+
+    sheet.clear(); // Bersihkan agar jika ada data dihapus, benar-benar hilang di sheet
+
+    if (!profiles || profiles.length === 0) {
+        return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+          .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var firstData = profiles[0].data || {};
+    var dataHeaders = Object.keys(firstData);
+    
+    var fullHeaders = ['_id', '_date', '_label'].concat(dataHeaders);
+    sheet.appendRow(fullHeaders);
+
+    var rows = [];
+    for (var i = 0; i < profiles.length; i++) {
+        var p = profiles[i];
+        var row = ["'" + p.id, "'" + p.date, "'" + p.label]; 
+        
+        for (var j = 0; j < dataHeaders.length; j++) {
+            var cellValue = p.data[dataHeaders[j]] || "";
+            // Tanda kutip memaksa text murni untuk NIK dan Tanggal
+            if (typeof cellValue === 'string') {
+                cellValue = "'" + cellValue;
+            }
+            row.push(cellValue);
+        }
+        rows.push(row);
+    }
+
+    if (rows.length > 0) {
+       sheet.getRange(2, 1, rows.length, fullHeaders.length).setValues(rows);
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
             };
 
             const handleLogoUpload = (e) => {
@@ -832,11 +860,10 @@ function doPost(e) {
                                     <i className="ph ph-file-dashed text-4xl"></i>
                                 </div>
                                 <h1 className="text-3xl font-black tracking-tight text-white">Dashboard Input Data Surat NA</h1>
-                                <p className="text-slate-400 text-sm mt-1 max-w-xl mx-auto">Kelola data pemohon secara lokal maupun tersinkronisasi dua arah dengan Google Sheets untuk pembuatan dokumen instan.</p>
+                                <p className="text-slate-400 text-sm mt-1 max-w-xl mx-auto">Kelola data pemohon secara lokal maupun tersinkronisasi dengan Google Sheets untuk pembuatan dokumen instan.</p>
                             </div>
 
                             <div className="space-y-6">
-                                {}
                                 {/* Integrasi Google Sheets Panel */}
                                 <div className="bg-gradient-to-br from-emerald-900/40 to-slate-900/90 backdrop-blur-md border border-emerald-800/50 p-6 rounded-3xl shadow-xl relative overflow-hidden">
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
@@ -844,7 +871,7 @@ function doPost(e) {
                                             <h3 className="text-base font-bold text-white flex items-center gap-2">
                                                 <i className="ph ph-google-logo text-emerald-400 text-lg"></i> Sinkronisasi Google Sheets
                                             </h3>
-                                            <p className="text-xs text-slate-400 mt-0.5">Tarik data daftar riwayat dari Sheet ke Form, atau dorong data paksa ke Sheet.</p>
+                                            <p className="text-xs text-slate-400 mt-0.5">Tarik data draft terbaru (Refresh) atau simpan pembaruan daftar riwayat ke Sheet.</p>
                                         </div>
                                         <div className="flex gap-3">
                                             <button 
@@ -853,13 +880,6 @@ function doPost(e) {
                                                 className={`bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <i className={`ph ph-arrows-clockwise text-base ${isSyncing ? 'spinner' : ''}`}></i> Ambil Data (Refresh)
-                                            </button>
-                                            <button 
-                                                onClick={() => syncToGoogleSheet(savedProfiles, true)} 
-                                                disabled={isSyncing}
-                                                className={`bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-emerald-600/20 ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                            >
-                                                <i className={`ph ph-cloud-arrow-up text-base ${isSyncing ? 'animate-bounce' : ''}`}></i> Simpan ke Sheet
                                             </button>
                                         </div>
                                     </div>
@@ -876,9 +896,9 @@ function doPost(e) {
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 relative z-10">
                                         <div>
                                             <h3 className="text-base font-bold text-white flex items-center gap-2">
-                                                <i className="ph ph-floppy-disk text-indigo-400 text-lg"></i> Riwayat Draft Tersinkronisasi
+                                                <i className="ph ph-floppy-disk text-indigo-400 text-lg"></i> Riwayat Draft Anda
                                             </h3>
-                                            <p className="text-xs text-slate-400 mt-0.5">Menyimpan dan menghapus disini otomatis berpengaruh ke Google Sheets.</p>
+                                            <p className="text-xs text-slate-400 mt-0.5">Semua data riwayat akan tersinkronisasi (Auto-Sync) dengan GSheet jika URL valid.</p>
                                         </div>
                                         <button onClick={saveCurrentData} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-indigo-600/20">
                                             <i className="ph ph-download-simple text-base"></i> Simpan Draft Saat Ini
@@ -887,7 +907,7 @@ function doPost(e) {
                                     
                                     {savedProfiles.length === 0 ? (
                                         <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 text-center text-xs text-slate-400 italic relative z-10">
-                                            Belum ada draft tersimpan.
+                                            Belum ada draft tersimpan. Silakan isi form dan tekan "Simpan Draft Saat Ini".
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-52 overflow-y-auto pr-1 relative z-10">
@@ -930,7 +950,6 @@ function doPost(e) {
                                     </div>
                                 </div>
 
-                                {}
                                 {/* Administrasi */}
                                 <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
                                     <h3 className="text-base font-bold text-white border-b border-slate-800 pb-3 mb-5 flex items-center gap-2">
@@ -951,6 +970,7 @@ function doPost(e) {
                                     </div>
                                 </div>
 
+                                {}
                                 {/* Calon Suami */}
                                 <div className={`bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800 border-l-4 ${data.jenisPemohon === 'L' ? 'border-l-indigo-500' : 'border-l-slate-700'}`}>
                                     <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-5">
@@ -965,6 +985,8 @@ function doPost(e) {
                                         <InputField label="Status Perkawinan" name="suamiStatus" value={data.suamiStatus} onChange={handleChange} icon="ph-info" />
                                         <InputField label="Tempat Lahir" name="suamiTempatLahir" value={data.suamiTempatLahir} onChange={handleChange} icon="ph-map-pin" />
                                         <InputField label="Tanggal Lahir" name="suamiTglLahir" value={data.suamiTglLahir} onChange={handleChange} icon="ph-calendar" />
+                                        <InputField label="Kewarganegaraan" name="suamiWarga" value={data.suamiWarga} onChange={handleChange} icon="ph-flag" />
+                                        <InputField label="Agama" name="suamiAgama" value={data.suamiAgama} onChange={handleChange} icon="ph-hands-praying" />
                                         <InputField label="Pekerjaan" name="suamiKerja" value={data.suamiKerja} onChange={handleChange} icon="ph-briefcase" />
                                         <div className="md:col-span-3">
                                             <InputField label="Alamat Lengkap" name="suamiAlamat" value={data.suamiAlamat} onChange={handleChange} icon="ph-house" />
@@ -981,6 +1003,8 @@ function doPost(e) {
                                                     <InputField label="NIK Ayah" name="ayahSuamiNik" value={data.ayahSuamiNik} onChange={handleChange} />
                                                     <InputField label="Tempat Lahir" name="ayahSuamiTempatLahir" value={data.ayahSuamiTempatLahir} onChange={handleChange} />
                                                     <InputField label="Tanggal Lahir" name="ayahSuamiTglLahir" value={data.ayahSuamiTglLahir} onChange={handleChange} />
+                                                    <InputField label="Kewarganegaraan" name="ayahSuamiWarga" value={data.ayahSuamiWarga} onChange={handleChange} />
+                                                    <InputField label="Agama" name="ayahSuamiAgama" value={data.ayahSuamiAgama} onChange={handleChange} />
                                                     <InputField label="Pekerjaan" name="ayahSuamiKerja" value={data.ayahSuamiKerja} onChange={handleChange} />
                                                     <InputField label="Alamat" name="ayahSuamiAlamat" value={data.ayahSuamiAlamat} onChange={handleChange} />
                                                 </div>
@@ -993,6 +1017,8 @@ function doPost(e) {
                                                     <InputField label="NIK Ibu" name="ibuSuamiNik" value={data.ibuSuamiNik} onChange={handleChange} />
                                                     <InputField label="Tempat Lahir" name="ibuSuamiTempatLahir" value={data.ibuSuamiTempatLahir} onChange={handleChange} />
                                                     <InputField label="Tanggal Lahir" name="ibuSuamiTglLahir" value={data.ibuSuamiTglLahir} onChange={handleChange} />
+                                                    <InputField label="Kewarganegaraan" name="ibuSuamiWarga" value={data.ibuSuamiWarga} onChange={handleChange} />
+                                                    <InputField label="Agama" name="ibuSuamiAgama" value={data.ibuSuamiAgama} onChange={handleChange} />
                                                     <InputField label="Pekerjaan" name="ibuSuamiKerja" value={data.ibuSuamiKerja} onChange={handleChange} />
                                                     <InputField label="Alamat" name="ibuSuamiAlamat" value={data.ibuSuamiAlamat} onChange={handleChange} />
                                                 </div>
@@ -1001,6 +1027,7 @@ function doPost(e) {
                                     )}
                                 </div>
 
+                                {}
                                 {/* Calon Istri */}
                                 <div className={`bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800 border-l-4 ${data.jenisPemohon === 'P' ? 'border-l-pink-500' : 'border-l-slate-700'}`}>
                                     <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-5">
@@ -1015,6 +1042,8 @@ function doPost(e) {
                                         <InputField label="Status Perkawinan" name="istriStatus" value={data.istriStatus} onChange={handleChange} icon="ph-info" />
                                         <InputField label="Tempat Lahir" name="istriTempatLahir" value={data.istriTempatLahir} onChange={handleChange} icon="ph-map-pin" />
                                         <InputField label="Tanggal Lahir" name="istriTglLahir" value={data.istriTglLahir} onChange={handleChange} icon="ph-calendar" />
+                                        <InputField label="Kewarganegaraan" name="istriWarga" value={data.istriWarga} onChange={handleChange} icon="ph-flag" />
+                                        <InputField label="Agama" name="istriAgama" value={data.istriAgama} onChange={handleChange} icon="ph-hands-praying" />
                                         <InputField label="Pekerjaan" name="istriKerja" value={data.istriKerja} onChange={handleChange} icon="ph-briefcase" />
                                         <div className="md:col-span-3">
                                             <InputField label="Alamat Lengkap" name="istriAlamat" value={data.istriAlamat} onChange={handleChange} icon="ph-house" />
@@ -1031,6 +1060,8 @@ function doPost(e) {
                                                     <InputField label="NIK Ayah" name="ayahIstriNik" value={data.ayahIstriNik} onChange={handleChange} />
                                                     <InputField label="Tempat Lahir" name="ayahIstriTempatLahir" value={data.ayahIstriTempatLahir} onChange={handleChange} />
                                                     <InputField label="Tanggal Lahir" name="ayahIstriTglLahir" value={data.ayahIstriTglLahir} onChange={handleChange} />
+                                                    <InputField label="Kewarganegaraan" name="ayahIstriWarga" value={data.ayahIstriWarga} onChange={handleChange} />
+                                                    <InputField label="Agama" name="ayahIstriAgama" value={data.ayahIstriAgama} onChange={handleChange} />
                                                     <InputField label="Pekerjaan" name="ayahIstriKerja" value={data.ayahIstriKerja} onChange={handleChange} />
                                                     <InputField label="Alamat" name="ayahIstriAlamat" value={data.ayahIstriAlamat} onChange={handleChange} />
                                                 </div>
@@ -1043,6 +1074,8 @@ function doPost(e) {
                                                     <InputField label="NIK Ibu" name="ibuIstriNik" value={data.ibuIstriNik} onChange={handleChange} />
                                                     <InputField label="Tempat Lahir" name="ibuIstriTempatLahir" value={data.ibuIstriTempatLahir} onChange={handleChange} />
                                                     <InputField label="Tanggal Lahir" name="ibuIstriTglLahir" value={data.ibuIstriTglLahir} onChange={handleChange} />
+                                                    <InputField label="Kewarganegaraan" name="ibuIstriWarga" value={data.ibuIstriWarga} onChange={handleChange} />
+                                                    <InputField label="Agama" name="ibuIstriAgama" value={data.ibuIstriAgama} onChange={handleChange} />
                                                     <InputField label="Pekerjaan" name="ibuIstriKerja" value={data.ibuIstriKerja} onChange={handleChange} />
                                                     <InputField label="Alamat" name="ibuIstriAlamat" value={data.ibuIstriAlamat} onChange={handleChange} />
                                                 </div>
@@ -1134,7 +1167,6 @@ function doPost(e) {
 
                         <main className="flex-1 overflow-y-auto p-6 relative print:p-0 print:overflow-visible">
                             
-                            {}
                             {/* --- PENGATURAN --- */}
                             {activeTab === 'pengaturan' && (
                                 <div className="max-w-3xl mx-auto space-y-6">
@@ -1185,7 +1217,7 @@ function doPost(e) {
                                                             onClick={() => setShowScriptGuide(!showScriptGuide)}
                                                             className="text-indigo-400 hover:text-indigo-300 font-semibold normal-case flex items-center gap-1"
                                                         >
-                                                            <i className="ph ph-info"></i> Panduan Script Baru!
+                                                            <i className="ph ph-info"></i> Panduan Script
                                                         </button>
                                                     </label>
                                                     <input 
@@ -1195,14 +1227,14 @@ function doPost(e) {
                                                         className="w-full px-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white text-sm placeholder-slate-600 font-mono"
                                                         placeholder="https://script.google.com/macros/s/AKfycby.../exec"
                                                     />
-                                                    <p className="text-xs text-slate-400 mt-2">Agar fitur auto-sync dua arah berfungsi, pastikan Anda menggunakan versi script terbaru dari panduan ini.</p>
+                                                    <p className="text-xs text-slate-400 mt-2">Agar aplikasi dapat tersinkronisasi otomatis (Auto-Sync) dengan Google Sheets, masukkan URL Web App dari Apps Script Anda di sini.</p>
                                                 </div>
 
                                             </div>
 
                                             {showScriptGuide && (
                                                 <div className="mt-4 bg-slate-950 p-5 rounded-2xl border border-slate-700 relative">
-                                                    <h4 className="text-sm font-bold text-white mb-2">Panduan Script Auto-Sync Google Sheets</h4>
+                                                    <h4 className="text-sm font-bold text-white mb-2">Panduan Pengaturan Google Sheets Auto-Sync</h4>
                                                     <ol className="list-decimal pl-5 text-xs text-slate-300 space-y-2 mb-4">
                                                         <li>Buka Google Sheets kosong.</li>
                                                         <li>Pilih Menu <b>Extensions (Ekstensi) &gt; Apps Script</b>.</li>
@@ -1268,7 +1300,6 @@ function doPost(e) {
                                 </div>
                             )}
 
-                            {}
                             {/* --- MODEL N1 --- */}
                             {activeTab === 'n1' && (
                                 <div className="a4-page print-only">
@@ -1644,7 +1675,6 @@ function doPost(e) {
                                 </div>
                             )}
 
-                             {}
                              {/* --- REKOMENDASI NIKAH --- */}
                              {activeTab === 'rekomendasi' && (
                                 <div className="a4-page print-only">
