@@ -93,30 +93,25 @@
             h2, h3 { margin-bottom: 0.15rem !important; }
             p.mb-4 { margin-bottom: 0.15rem !important; }
             
-            /* Mengurangi padding tabel secara global saat print */
             .form-table td, table td {
                 padding: 0px 2px !important;
                 line-height: 1.05 !important;
             }
-            
-            /* Mematikan class 'py-1' (padding Y) pada tabel saat print */
             .py-1 {
                 padding-top: 0 !important;
                 padding-bottom: 0 !important;
             }
 
-            /* --- KOP SURAT PRINT ADJUSTMENTS --- */
             .kop-surat {
-                margin-bottom: 2px !important; /* Kurangi jarak bawah kop surat drastis */
-                padding-bottom: 2px !important; /* Kurangi padding bawah kop surat drastis */
-                border-bottom: 2px solid black !important; /* Pertegas garis bawah jika perlu, atau sesuaikan */
+                margin-bottom: 2px !important; 
+                padding-bottom: 2px !important; 
+                border-bottom: 2px solid black !important; 
             }
             .kop-surat h1 { font-size: 14pt !important; margin: 0 !important; line-height: 1.1 !important;}
             .kop-surat h2 { font-size: 13pt !important; margin: 0 !important; line-height: 1.1 !important;}
             .kop-surat h3 { font-size: 12pt !important; margin: 0 !important; line-height: 1.1 !important;}
             .kop-surat p { font-size: 9pt !important; margin: 0 !important; line-height: 1.1 !important;}
             
-            /* Menyesuaikan margin elemen setelah kop surat (nomor surat/judul) */
             .kop-surat + div {
                  margin-top: 2px !important; 
                  margin-bottom: 4px !important;
@@ -169,6 +164,15 @@
             margin-top: 2.5rem;
             page-break-inside: avoid;
         }
+
+        /* Spinner Animation */
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-slate-100 font-sans min-h-screen">
@@ -195,6 +199,7 @@
         );
 
         function App() {
+            // State untuk Autentikasi dan Navigasi
             const [isAuthenticated, setIsAuthenticated] = useState(false);
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
@@ -205,13 +210,21 @@
             
             const [notification, setNotification] = useState(null);
             const [savedProfiles, setSavedProfiles] = useState([]);
+            
+            // State untuk Indikator Sinkronisasi Google Sheets
+            const [isSyncing, setIsSyncing] = useState(false);
+            const [showScriptGuide, setShowScriptGuide] = useState(false);
 
+            // State Konfigurasi Sistem
             const [config, setConfig] = useState({
                 username: 'NALAKILAKI',
                 password: 'NALAKILAKI',
                 email: '',
-                logoUrl: ''
+                logoUrl: '',
+                googleSheetUrl: '' // URL Google Apps Script Web App
             });
+            
+            // State Lupa Sandi & Pengaturan
             const [isForgotPass, setIsForgotPass] = useState(false);
             const [recoveryEmail, setRecoveryEmail] = useState('');
             const [resetStep, setResetStep] = useState(1);
@@ -219,7 +232,8 @@
             const [settingsData, setSettingsData] = useState({
                 username: '',
                 password: '',
-                email: ''
+                email: '',
+                googleSheetUrl: ''
             });
 
             const [data, setData] = useState({
@@ -315,7 +329,8 @@
                         setSettingsData({
                             username: parsed.username,
                             password: parsed.password,
-                            email: parsed.email || ''
+                            email: parsed.email || '',
+                            googleSheetUrl: parsed.googleSheetUrl || ''
                         });
                     } catch (e) {
                         console.error("Gagal memuat config", e);
@@ -324,7 +339,8 @@
                     setSettingsData({
                         username: 'NALAKILAKI',
                         password: 'NALAKILAKI',
-                        email: ''
+                        email: '',
+                        googleSheetUrl: ''
                     });
                 }
             }, []);
@@ -377,6 +393,101 @@
                 localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
                 showNotification('Pengaturan berhasil disimpan!');
             };
+
+            // =========================================================================
+            // FUNGSI GOOGLE SHEETS
+            // =========================================================================
+            const syncToGoogleSheet = async () => {
+                if (!config.googleSheetUrl) {
+                    showNotification("URL Google Sheet Apps Script belum diatur di menu Pengaturan!", "error");
+                    return;
+                }
+                setIsSyncing(true);
+                try {
+                    // Gunakan text/plain untuk bypass CORS preflight pada Apps Script
+                    const response = await fetch(config.googleSheetUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8', 
+                        },
+                        body: JSON.stringify({ action: 'save', data: data })
+                    });
+                    const result = await response.json();
+                    if(result.status === 'success') {
+                        showNotification("Data form berhasil dikirim ke Google Sheet!");
+                    } else {
+                        throw new Error("Respon server tidak sukses");
+                    }
+                } catch (error) {
+                    console.error("GSheet Sync Error:", error);
+                    showNotification("Gagal menghubungi server GSheet. Coba periksa URL dan script Anda.", "error");
+                } finally {
+                    setIsSyncing(false);
+                }
+            };
+
+            const fetchFromGoogleSheet = async () => {
+                if (!config.googleSheetUrl) {
+                    showNotification("URL Google Sheet Apps Script belum diatur di menu Pengaturan!", "error");
+                    return;
+                }
+                setIsSyncing(true);
+                try {
+                    const response = await fetch(`${config.googleSheetUrl}?action=get`);
+                    const result = await response.json();
+                    if (result && result.data && Object.keys(result.data).length > 0) {
+                        // Gabungkan data form yang ada dengan data terbaru dari sheet (jika field cocok)
+                        setData(prevData => ({...prevData, ...result.data}));
+                        showNotification("Data berhasil di-refresh dan ditarik dari Google Sheet!");
+                    } else {
+                        showNotification("Data di Google Sheet kosong atau format tidak valid.", "error");
+                    }
+                } catch (error) {
+                    console.error("GSheet Fetch Error:", error);
+                    showNotification("Gagal mengambil data. Pastikan URL Apps Script benar.", "error");
+                } finally {
+                    setIsSyncing(false);
+                }
+            };
+
+            const getGoogleScriptTemplate = () => {
+                return `function doGet(e) {
+  if (e.parameter.action === 'get') {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) return ContentService.createTextOutput(JSON.stringify({data: {}})).setMimeType(ContentService.MimeType.JSON);
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var values = sheet.getRange(lastRow, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var data = {};
+    for (var i = 0; i < headers.length; i++) { data[headers[i]] = values[i]; }
+    return ContentService.createTextOutput(JSON.stringify({data: data})).setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput("GSheet API Ready");
+}
+
+function doPost(e) {
+  var parsedData = JSON.parse(e.postData.contents);
+  if (parsedData.action === 'save') {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var rowData = parsedData.data;
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    
+    // Jika belum ada header (baris kosong), buat header dari keys
+    if (headers.length === 0 || headers[0] === "") {
+       headers = Object.keys(rowData);
+       sheet.appendRow(headers);
+    }
+    
+    var newRow = [];
+    for (var i = 0; i < headers.length; i++) { 
+        newRow.push(rowData[headers[i]] || ""); 
+    }
+    sheet.appendRow(newRow);
+    return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+            };
+            // =========================================================================
 
             const handleLogoUpload = (e) => {
                 const file = e.target.files[0];
@@ -446,6 +557,11 @@
                 setIsLoggedIn(true);
                 window.scrollTo(0, 0);
             };
+
+            const copyToClipboard = () => {
+                navigator.clipboard.writeText(getGoogleScriptTemplate());
+                showNotification('Script disalin ke clipboard!');
+            }
 
             const tabs = [
                 { id: 'n1', label: 'Model N1 (Pengantar)', icon: 'ph-file-text' },
@@ -532,7 +648,7 @@
                             <div className="text-center mt-6 mb-8">
                                 <span className="inline-block px-3 py-1 bg-indigo-500/10 text-indigo-400 text-xs font-semibold rounded-full mb-2 tracking-wide uppercase border border-indigo-500/20">Secure Portal</span>
                                 <h1 className="text-2xl font-black text-white tracking-tight">SIM NA PREMIUM 2026</h1>
-                                <p className="text-slate-400 text-sm mt-1">Sistem Administrasi Nikah Desa</p>
+                                <p className="text-slate-400 text-sm mt-1">Sistem Administrasi Nikah + GSheet Sync</p>
                             </div>
                             
                             {!isForgotPass ? (
@@ -679,19 +795,52 @@
                                     <i className="ph ph-file-dashed text-4xl"></i>
                                 </div>
                                 <h1 className="text-3xl font-black tracking-tight text-white">Dashboard Input Data Surat NA</h1>
-                                <p className="text-slate-400 text-sm mt-1 max-w-xl mx-auto">Kelola data pemohon, administrasi kantor desa, dan keluarga untuk kompilasi dokumen otomatis secara instan.</p>
+                                <p className="text-slate-400 text-sm mt-1 max-w-xl mx-auto">Kelola data pemohon secara lokal maupun tersinkronisasi dengan Google Sheets untuk pembuatan dokumen instan.</p>
                             </div>
 
                             <div className="space-y-6">
-                                {/* Saved Draft Manager */}
+                                {/* Integrasi Google Sheets Panel */}
+                                <div className="bg-gradient-to-br from-emerald-900/40 to-slate-900/90 backdrop-blur-md border border-emerald-800/50 p-6 rounded-3xl shadow-xl relative overflow-hidden">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
+                                        <div>
+                                            <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                                <i className="ph ph-google-logo text-emerald-400 text-lg"></i> Sinkronisasi Google Sheets
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-0.5">Tarik data (refresh) dari Sheet ke Form, atau simpan data Form ke Sheet.</p>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <button 
+                                                onClick={fetchFromGoogleSheet} 
+                                                disabled={isSyncing}
+                                                className={`bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                <i className={`ph ph-arrows-clockwise text-base ${isSyncing ? 'spinner' : ''}`}></i> Ambil Data (Refresh)
+                                            </button>
+                                            <button 
+                                                onClick={syncToGoogleSheet} 
+                                                disabled={isSyncing}
+                                                className={`bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-emerald-600/20 ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                <i className={`ph ph-cloud-arrow-up text-base ${isSyncing ? 'animate-bounce' : ''}`}></i> Simpan ke Sheet
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {!config.googleSheetUrl && (
+                                        <div className="mt-3 text-xs text-red-400 flex items-center gap-2">
+                                            <i className="ph ph-warning-circle"></i> URL Google Apps Script belum disetel. Buka menu <b>Pengaturan Sistem</b> (di halaman dokumen) untuk menyetelnya.
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Saved Draft Manager Lokal */}
                                 <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-6 rounded-3xl shadow-xl relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/5 rounded-bl-full pointer-events-none"></div>
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 relative z-10">
                                         <div>
                                             <h3 className="text-base font-bold text-white flex items-center gap-2">
-                                                <i className="ph ph-floppy-disk text-indigo-400 text-lg"></i> Riwayat Draft Tersimpan
+                                                <i className="ph ph-floppy-disk text-indigo-400 text-lg"></i> Riwayat Draft Lokal
                                             </h3>
-                                            <p className="text-xs text-slate-400 mt-0.5">Simpan isian form ke memori lokal browser agar bisa dimuat kembali kapan saja.</p>
+                                            <p className="text-xs text-slate-400 mt-0.5">Simpan isian form ke memori lokal browser agar bisa dimuat kembali.</p>
                                         </div>
                                         <button onClick={saveCurrentData} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-indigo-600/20">
                                             <i className="ph ph-download-simple text-base"></i> Simpan Draft Saat Ini
@@ -700,7 +849,7 @@
                                     
                                     {savedProfiles.length === 0 ? (
                                         <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 text-center text-xs text-slate-400 italic relative z-10">
-                                            Belum ada draft tersimpan. Klik "Simpan Draft Saat Ini" untuk merekam data formulir.
+                                            Belum ada draft tersimpan di browser ini.
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-52 overflow-y-auto pr-1 relative z-10">
@@ -874,6 +1023,12 @@
                                 </div>
                             </div>
                         </div>
+                        {notification && (
+                            <div className={`fixed bottom-6 right-6 px-5 py-3.5 rounded-2xl shadow-2xl z-50 flex items-center gap-3 border backdrop-blur-md ${notification.type === 'success' ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200' : 'bg-red-950/90 border-red-500/50 text-red-200'}`}>
+                                <i className={`ph ${notification.type === 'success' ? 'ph-check-circle text-emerald-400' : 'ph-warning-circle text-red-400'} text-xl`}></i>
+                                <span className="text-xs font-semibold">{notification.message}</span>
+                            </div>
+                        )}
                     </div>
                 );
             }
@@ -909,7 +1064,7 @@
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all text-xs font-semibold ${activeTab === tab.id ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}
                                 >
-                                    <i className={`ph ${tab.icon} text-lg ${activeTab === tab.id ? 'text-white' : 'text-indigo-400'}`}></i>
+                                    <i className={`ph ${tab.icon} text-lg ${activeTab === tab.id ? 'text-white' : tab.id === 'pengaturan' ? 'text-emerald-400' : 'text-indigo-400'}`}></i>
                                     <span>{tab.label}</span>
                                 </button>
                             ))}
@@ -924,26 +1079,29 @@
                                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                                     {tabs.find(t => t.id === activeTab)?.label}
                                 </h2>
-                                {data.jenisPemohon === 'P' && <span className="bg-pink-500/10 border border-pink-500/20 text-pink-300 text-[10px] px-2 py-0.5 rounded-full uppercase font-bold">Pihak Perempuan</span>}
+                                {data.jenisPemohon === 'P' && activeTab !== 'pengaturan' && <span className="bg-pink-500/10 border border-pink-500/20 text-pink-300 text-[10px] px-2 py-0.5 rounded-full uppercase font-bold">Pihak Perempuan</span>}
                             </div>
-                            <div className="flex items-center gap-3">
-                                <button onClick={handleDownloadPDF} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all">
-                                    <i className="ph ph-file-pdf text-base"></i> Unduh PDF
-                                </button>
-                                <button onClick={handlePrint} className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all">
-                                    <i className="ph ph-printer text-base"></i> Cetak Dokumen
-                                </button>
-                            </div>
+                            {activeTab !== 'pengaturan' && (
+                                <div className="flex items-center gap-3">
+                                    <button onClick={handleDownloadPDF} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all">
+                                        <i className="ph ph-file-pdf text-base"></i> Unduh PDF
+                                    </button>
+                                    <button onClick={handlePrint} className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all">
+                                        <i className="ph ph-printer text-base"></i> Cetak Dokumen
+                                    </button>
+                                </div>
+                            )}
                         </header>
 
                         <main className="flex-1 overflow-y-auto p-6 relative print:p-0 print:overflow-visible">
                             
                             {/* --- PENGATURAN --- */}
+                            {}
                             {activeTab === 'pengaturan' && (
                                 <div className="max-w-3xl mx-auto space-y-6">
                                     <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
                                         <h3 className="text-lg font-black text-white border-b border-slate-800 pb-4 mb-6 flex items-center gap-3">
-                                            <i className="ph ph-gear text-indigo-400 text-2xl"></i> Pengaturan Sistem & Kredensial
+                                            <i className="ph ph-gear text-indigo-400 text-2xl"></i> Pengaturan Sistem & Integrasi GSheet
                                         </h3>
                                         
                                         <form onSubmit={saveConfig} className="space-y-6">
@@ -978,11 +1136,66 @@
                                                         placeholder="contoh@gmail.com"
                                                     />
                                                 </div>
+                                                
+                                                {/* Input GSheet */}
+                                                <div className="md:col-span-2 bg-emerald-900/20 p-5 rounded-2xl border border-emerald-500/20">
+                                                    <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                                        <span>URL Web App Google Apps Script (Untuk GSheet)</span>
+                                                        <button 
+                                                            type="button" 
+                                                            onClick={() => setShowScriptGuide(!showScriptGuide)}
+                                                            className="text-indigo-400 hover:text-indigo-300 font-semibold normal-case flex items-center gap-1"
+                                                        >
+                                                            <i className="ph ph-info"></i> Panduan Script
+                                                        </button>
+                                                    </label>
+                                                    <input 
+                                                        type="url" 
+                                                        value={settingsData.googleSheetUrl} 
+                                                        onChange={e => setSettingsData({...settingsData, googleSheetUrl: e.target.value})}
+                                                        className="w-full px-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white text-sm placeholder-slate-600 font-mono"
+                                                        placeholder="https://script.google.com/macros/s/AKfycby.../exec"
+                                                    />
+                                                    <p className="text-xs text-slate-400 mt-2">Agar aplikasi dapat mengirim dan menarik data dari Google Sheets, masukkan URL Web App dari Apps Script Anda di sini.</p>
+                                                </div>
+
                                             </div>
+
+                                            {showScriptGuide && (
+                                                <div className="mt-4 bg-slate-950 p-5 rounded-2xl border border-slate-700 relative">
+                                                    <h4 className="text-sm font-bold text-white mb-2">Panduan Pengaturan Google Sheets</h4>
+                                                    <ol className="list-decimal pl-5 text-xs text-slate-300 space-y-2 mb-4">
+                                                        <li>Buka Google Sheets kosong.</li>
+                                                        <li>Pilih Menu <b>Extensions (Ekstensi) &gt; Apps Script</b>.</li>
+                                                        <li>Hapus kode yang ada, lalu <b>Copy Paste kode di bawah ini</b>.</li>
+                                                        <li>Simpan proyek (Ctrl+S).</li>
+                                                        <li>Klik <b>Deploy (Terapkan) &gt; New Deployment (Penerapan Baru)</b>.</li>
+                                                        <li>Pilih tipe <b>Web App</b>. Akses (Who has access) ubah menjadi <b>"Anyone" (Siapa Saja)</b>.</li>
+                                                        <li>Klik <b>Deploy</b> (mungkin akan meminta otorisasi akun Google Anda).</li>
+                                                        <li><b>Copy URL Web App</b> yang dihasilkan dan paste pada kolom URL di atas, lalu klik <b>Simpan</b>.</li>
+                                                    </ol>
+                                                    
+                                                    <div className="relative">
+                                                        <button 
+                                                            type="button" 
+                                                            onClick={copyToClipboard}
+                                                            className="absolute top-2 right-2 bg-slate-800 hover:bg-slate-700 text-white p-2 rounded-lg text-xs"
+                                                            title="Copy Script"
+                                                        >
+                                                            <i className="ph ph-copy text-lg"></i>
+                                                        </button>
+                                                        <textarea 
+                                                            readOnly 
+                                                            className="w-full h-48 bg-slate-900 border border-slate-700 rounded-xl p-4 text-emerald-400 font-mono text-xs focus:outline-none"
+                                                            value={getGoogleScriptTemplate()}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
                                             
                                             <div className="pt-4">
                                                 <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition-all">
-                                                    <i className="ph ph-floppy-disk text-lg"></i> Simpan Kredensial
+                                                    <i className="ph ph-floppy-disk text-lg"></i> Simpan Pengaturan
                                                 </button>
                                             </div>
                                         </form>
@@ -1016,6 +1229,7 @@
                                 </div>
                             )}
 
+                            {}
                             {/* --- MODEL N1 --- */}
                             {activeTab === 'n1' && (
                                 <div className="a4-page print-only">
@@ -1104,6 +1318,7 @@
                                 </div>
                             )}
 
+                            {}
                             {/* --- MODEL N2 --- */}
                             {activeTab === 'n2' && (
                                 <div className="a4-page print-only">
@@ -1174,6 +1389,7 @@
                                 </div>
                             )}
 
+                            {}
                             {/* --- MODEL N3 --- */}
                             {activeTab === 'n3' && (
                                 <div className="a4-page print-only">
@@ -1231,6 +1447,7 @@
                                 </div>
                             )}
 
+                             {}
                              {/* --- MODEL N4 --- */}
                              {activeTab === 'n4' && (
                                 <div className="a4-page print-only">
@@ -1297,6 +1514,7 @@
                                 </div>
                             )}
 
+                             {}
                              {/* --- MODEL N5 --- */}
                              {activeTab === 'n5' && (
                                 <div className="a4-page print-only">
@@ -1391,6 +1609,7 @@
                                 </div>
                             )}
 
+                             {}
                              {/* --- REKOMENDASI NIKAH --- */}
                              {activeTab === 'rekomendasi' && (
                                 <div className="a4-page print-only">
@@ -1407,7 +1626,6 @@
                                         <div className="w-20 h-20 flex-shrink-0"></div>
                                     </div>
 
-                                    {/* DIV BARU UNTUK KONTROL SPASI SETELAH KOP */}
                                     <div>
                                         <div className="flex justify-between mb-4">
                                             <table className="w-2/3">
@@ -1481,6 +1699,7 @@
                                 </div>
                             )}
 
+                             {}
                              {/* --- NUMPANG NIKAH --- */}
                              {activeTab === 'numpang' && (
                                 <div className="a4-page print-only">
@@ -1497,7 +1716,6 @@
                                         <div className="w-20 h-20 flex-shrink-0"></div>
                                     </div>
 
-                                    {/* DIV BARU UNTUK KONTROL SPASI SETELAH KOP */}
                                     <div>
                                         <div className="text-center mb-6">
                                             <h3 className="font-bold underline text-xl">SURAT KETERANGAN NUMPANG NIKAH</h3>
@@ -1547,6 +1765,7 @@
                                 </div>
                             )}
 
+                             {}
                              {/* --- KETERANGAN BELUM MENIKAH --- */}
                              {activeTab === 'belum_nikah' && (
                                 <div className="a4-page print-only">
