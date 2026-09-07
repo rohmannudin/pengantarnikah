@@ -221,7 +221,7 @@
                 password: 'NALAKILAKI',
                 email: '',
                 logoUrl: '',
-                googleSheetUrl: '' // URL Google Apps Script Web App
+                googleSheetUrl: '' 
             });
             
             // State Lupa Sandi & Pengaturan
@@ -311,21 +311,136 @@
                 ibuIstriAlamat: 'Jl. Pembangunan Dusun. Selatan Rt/Rw 005/002 Kecamatan Maos'
             });
 
-            useEffect(() => {
-                const saved = localStorage.getItem('sim_na_premium_saved');
-                if (saved) {
-                    try {
-                        setSavedProfiles(JSON.parse(saved));
-                    } catch (e) {
-                        console.error("Gagal memuat data", e);
+            // =========================================================================
+            // FUNGSI GOOGLE SHEETS (DIPERBARUI UNTUK RIWAYAT KESELURUHAN)
+            // =========================================================================
+            const syncToGoogleSheet = async (profilesToSync = savedProfiles, showMsg = true) => {
+                if (!config.googleSheetUrl) return; // Silent return if no URL
+                setIsSyncing(true);
+                try {
+                    const response = await fetch(config.googleSheetUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8', 
+                        },
+                        body: JSON.stringify({ action: 'sync_all', profiles: profilesToSync })
+                    });
+                    const result = await response.json();
+                    if(result.status === 'success') {
+                        if(showMsg) showNotification("Berhasil tersinkronisasi ke Google Sheet!");
+                    } else {
+                        throw new Error("Respon server tidak sukses");
                     }
+                } catch (error) {
+                    console.error("GSheet Sync Error:", error);
+                    if(showMsg) showNotification("Gagal sinkronisasi ke GSheet.", "error");
+                } finally {
+                    setIsSyncing(false);
                 }
+            };
 
+            const fetchFromGoogleSheet = async (url = config.googleSheetUrl, showMsg = true) => {
+                if (!url) {
+                    if(showMsg) showNotification("URL Google Sheet belum diatur!", "error");
+                    return;
+                }
+                setIsSyncing(true);
+                try {
+                    const response = await fetch(`${url}?action=get_all`);
+                    const result = await response.json();
+                    if (result && result.status === 'success') {
+                        // Memperbarui daftar riwayat dari sheet
+                        const incomingData = Array.isArray(result.data) ? result.data : [];
+                        setSavedProfiles(incomingData);
+                        localStorage.setItem('sim_na_premium_saved', JSON.stringify(incomingData));
+                        if(showMsg) showNotification("Data riwayat berhasil ditarik & diperbarui dari Google Sheet!");
+                    }
+                } catch (error) {
+                    console.error("GSheet Fetch Error:", error);
+                    if(showMsg) showNotification("Gagal mengambil data. Pastikan URL Apps Script benar.", "error");
+                } finally {
+                    setIsSyncing(false);
+                }
+            };
+
+            const getGoogleScriptTemplate = () => {
+                return `function doGet(e) {
+  if (e.parameter.action === 'get_all') {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var lastRow = sheet.getLastRow();
+    var lastCol = sheet.getLastColumn();
+
+    if (lastRow < 2) {
+      return ContentService.createTextOutput(JSON.stringify({status: 'success', data: []})).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    var dataRange = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+
+    var profiles = [];
+    for (var i = 0; i < dataRange.length; i++) {
+      var row = dataRange[i];
+      var profile = { data: {} };
+      for (var j = 0; j < headers.length; j++) {
+        if (headers[j] === '_id') profile.id = row[j];
+        else if (headers[j] === '_date') profile.date = row[j];
+        else if (headers[j] === '_label') profile.label = row[j];
+        else profile.data[headers[j]] = row[j];
+      }
+      profiles.push(profile);
+    }
+    return ContentService.createTextOutput(JSON.stringify({status: 'success', data: profiles})).setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput("GSheet API Ready - Gunakan parameter ?action=get_all");
+}
+
+function doPost(e) {
+  var parsedData = JSON.parse(e.postData.contents);
+  if (parsedData.action === 'sync_all') {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var profiles = parsedData.profiles;
+
+    sheet.clear(); // Bersihkan sheet lama agar sesuai dengan daftar baru (termasuk penghapusan)
+
+    if (!profiles || profiles.length === 0) {
+        return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Buat Headers dari data pertama
+    var firstData = profiles[0].data || {};
+    var dataHeaders = Object.keys(firstData);
+    var fullHeaders = ['_id', '_date', '_label'].concat(dataHeaders);
+    sheet.appendRow(fullHeaders);
+
+    // Masukkan semua baris data
+    var rows = [];
+    for (var i = 0; i < profiles.length; i++) {
+        var p = profiles[i];
+        var row = [p.id, p.date, p.label];
+        for (var j = 0; j < dataHeaders.length; j++) {
+            row.push(p.data[dataHeaders[j]] || "");
+        }
+        rows.push(row);
+    }
+
+    if (rows.length > 0) {
+       sheet.getRange(2, 1, rows.length, fullHeaders.length).setValues(rows);
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+            };
+            // =========================================================================
+
+            useEffect(() => {
+                let initialUrl = '';
                 const savedConfig = localStorage.getItem('sim_na_config');
                 if (savedConfig) {
                     try {
                         const parsed = JSON.parse(savedConfig);
                         setConfig(parsed);
+                        initialUrl = parsed.googleSheetUrl;
                         setSettingsData({
                             username: parsed.username,
                             password: parsed.password,
@@ -343,6 +458,17 @@
                         googleSheetUrl: ''
                     });
                 }
+
+                // Coba muat riwayat lokal dulu agar UI tidak kosong
+                const saved = localStorage.getItem('sim_na_premium_saved');
+                if (saved) {
+                    try { setSavedProfiles(JSON.parse(saved)); } catch (e) {}
+                }
+
+                // Otomatis tarik data dari Sheet jika URL ada (Menggantikan data lokal jika ada beda)
+                if (initialUrl) {
+                    fetchFromGoogleSheet(initialUrl, false); 
+                }
             }, []);
 
             const showNotification = (msg, type = 'success') => {
@@ -352,15 +478,18 @@
 
             const saveCurrentData = () => {
                 const newProfile = {
-                    id: Date.now(),
+                    id: Date.now().toString(), // Pastikan ID berupa string agar kompatibel dengan Sheets
                     date: new Date().toLocaleString('id-ID'),
                     label: `${data.suamiNama || 'Suami'} & ${data.istriNama || 'Istri'} (${data.jenisPemohon === 'L' ? 'Laki-laki' : 'Perempuan'})`,
                     data: { ...data }
                 };
-                const updatedProfiles = [newProfile, ...savedProfiles].slice(0, 10);
+                const updatedProfiles = [newProfile, ...savedProfiles].slice(0, 50); // Batasi 50 riwayat
                 setSavedProfiles(updatedProfiles);
                 localStorage.setItem('sim_na_premium_saved', JSON.stringify(updatedProfiles));
-                showNotification('Draft berhasil disimpan ke memori lokal!');
+                showNotification('Draft disimpan! Melakukan sinkronisasi...');
+                
+                // Otomatis Push ke Sheet
+                syncToGoogleSheet(updatedProfiles, false);
             };
 
             const loadData = (profile) => {
@@ -372,7 +501,10 @@
                 const updated = savedProfiles.filter(p => p.id !== id);
                 setSavedProfiles(updated);
                 localStorage.setItem('sim_na_premium_saved', JSON.stringify(updated));
-                showNotification('Draft berhasil dihapus.', 'error');
+                showNotification('Draft dihapus secara lokal dan awan.', 'error');
+                
+                // Otomatis Push ke Sheet (Karena data dihapus, sheet akan diperbarui dengan data yg sudah berkurang)
+                syncToGoogleSheet(updated, false);
             };
 
             const handleLogin = (e) => {
@@ -393,101 +525,6 @@
                 localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
                 showNotification('Pengaturan berhasil disimpan!');
             };
-
-            // =========================================================================
-            // FUNGSI GOOGLE SHEETS
-            // =========================================================================
-            const syncToGoogleSheet = async () => {
-                if (!config.googleSheetUrl) {
-                    showNotification("URL Google Sheet Apps Script belum diatur di menu Pengaturan!", "error");
-                    return;
-                }
-                setIsSyncing(true);
-                try {
-                    // Gunakan text/plain untuk bypass CORS preflight pada Apps Script
-                    const response = await fetch(config.googleSheetUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'text/plain;charset=utf-8', 
-                        },
-                        body: JSON.stringify({ action: 'save', data: data })
-                    });
-                    const result = await response.json();
-                    if(result.status === 'success') {
-                        showNotification("Data form berhasil dikirim ke Google Sheet!");
-                    } else {
-                        throw new Error("Respon server tidak sukses");
-                    }
-                } catch (error) {
-                    console.error("GSheet Sync Error:", error);
-                    showNotification("Gagal menghubungi server GSheet. Coba periksa URL dan script Anda.", "error");
-                } finally {
-                    setIsSyncing(false);
-                }
-            };
-
-            const fetchFromGoogleSheet = async () => {
-                if (!config.googleSheetUrl) {
-                    showNotification("URL Google Sheet Apps Script belum diatur di menu Pengaturan!", "error");
-                    return;
-                }
-                setIsSyncing(true);
-                try {
-                    const response = await fetch(`${config.googleSheetUrl}?action=get`);
-                    const result = await response.json();
-                    if (result && result.data && Object.keys(result.data).length > 0) {
-                        // Gabungkan data form yang ada dengan data terbaru dari sheet (jika field cocok)
-                        setData(prevData => ({...prevData, ...result.data}));
-                        showNotification("Data berhasil di-refresh dan ditarik dari Google Sheet!");
-                    } else {
-                        showNotification("Data di Google Sheet kosong atau format tidak valid.", "error");
-                    }
-                } catch (error) {
-                    console.error("GSheet Fetch Error:", error);
-                    showNotification("Gagal mengambil data. Pastikan URL Apps Script benar.", "error");
-                } finally {
-                    setIsSyncing(false);
-                }
-            };
-
-            const getGoogleScriptTemplate = () => {
-                return `function doGet(e) {
-  if (e.parameter.action === 'get') {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var lastRow = sheet.getLastRow();
-    if (lastRow < 2) return ContentService.createTextOutput(JSON.stringify({data: {}})).setMimeType(ContentService.MimeType.JSON);
-    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-    var values = sheet.getRange(lastRow, 1, 1, sheet.getLastColumn()).getValues()[0];
-    var data = {};
-    for (var i = 0; i < headers.length; i++) { data[headers[i]] = values[i]; }
-    return ContentService.createTextOutput(JSON.stringify({data: data})).setMimeType(ContentService.MimeType.JSON);
-  }
-  return ContentService.createTextOutput("GSheet API Ready");
-}
-
-function doPost(e) {
-  var parsedData = JSON.parse(e.postData.contents);
-  if (parsedData.action === 'save') {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var rowData = parsedData.data;
-    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-    
-    // Jika belum ada header (baris kosong), buat header dari keys
-    if (headers.length === 0 || headers[0] === "") {
-       headers = Object.keys(rowData);
-       sheet.appendRow(headers);
-    }
-    
-    var newRow = [];
-    for (var i = 0; i < headers.length; i++) { 
-        newRow.push(rowData[headers[i]] || ""); 
-    }
-    sheet.appendRow(newRow);
-    return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
-  }
-}`;
-            };
-            // =========================================================================
 
             const handleLogoUpload = (e) => {
                 const file = e.target.files[0];
@@ -795,10 +832,11 @@ function doPost(e) {
                                     <i className="ph ph-file-dashed text-4xl"></i>
                                 </div>
                                 <h1 className="text-3xl font-black tracking-tight text-white">Dashboard Input Data Surat NA</h1>
-                                <p className="text-slate-400 text-sm mt-1 max-w-xl mx-auto">Kelola data pemohon secara lokal maupun tersinkronisasi dengan Google Sheets untuk pembuatan dokumen instan.</p>
+                                <p className="text-slate-400 text-sm mt-1 max-w-xl mx-auto">Kelola data pemohon secara lokal maupun tersinkronisasi dua arah dengan Google Sheets untuk pembuatan dokumen instan.</p>
                             </div>
 
                             <div className="space-y-6">
+                                {}
                                 {/* Integrasi Google Sheets Panel */}
                                 <div className="bg-gradient-to-br from-emerald-900/40 to-slate-900/90 backdrop-blur-md border border-emerald-800/50 p-6 rounded-3xl shadow-xl relative overflow-hidden">
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
@@ -806,18 +844,18 @@ function doPost(e) {
                                             <h3 className="text-base font-bold text-white flex items-center gap-2">
                                                 <i className="ph ph-google-logo text-emerald-400 text-lg"></i> Sinkronisasi Google Sheets
                                             </h3>
-                                            <p className="text-xs text-slate-400 mt-0.5">Tarik data (refresh) dari Sheet ke Form, atau simpan data Form ke Sheet.</p>
+                                            <p className="text-xs text-slate-400 mt-0.5">Tarik data daftar riwayat dari Sheet ke Form, atau dorong data paksa ke Sheet.</p>
                                         </div>
                                         <div className="flex gap-3">
                                             <button 
-                                                onClick={fetchFromGoogleSheet} 
+                                                onClick={() => fetchFromGoogleSheet(config.googleSheetUrl, true)} 
                                                 disabled={isSyncing}
                                                 className={`bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <i className={`ph ph-arrows-clockwise text-base ${isSyncing ? 'spinner' : ''}`}></i> Ambil Data (Refresh)
                                             </button>
                                             <button 
-                                                onClick={syncToGoogleSheet} 
+                                                onClick={() => syncToGoogleSheet(savedProfiles, true)} 
                                                 disabled={isSyncing}
                                                 className={`bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-emerald-600/20 ${isSyncing ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
@@ -838,9 +876,9 @@ function doPost(e) {
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 relative z-10">
                                         <div>
                                             <h3 className="text-base font-bold text-white flex items-center gap-2">
-                                                <i className="ph ph-floppy-disk text-indigo-400 text-lg"></i> Riwayat Draft Lokal
+                                                <i className="ph ph-floppy-disk text-indigo-400 text-lg"></i> Riwayat Draft Tersinkronisasi
                                             </h3>
-                                            <p className="text-xs text-slate-400 mt-0.5">Simpan isian form ke memori lokal browser agar bisa dimuat kembali.</p>
+                                            <p className="text-xs text-slate-400 mt-0.5">Menyimpan dan menghapus disini otomatis berpengaruh ke Google Sheets.</p>
                                         </div>
                                         <button onClick={saveCurrentData} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-indigo-600/20">
                                             <i className="ph ph-download-simple text-base"></i> Simpan Draft Saat Ini
@@ -849,7 +887,7 @@ function doPost(e) {
                                     
                                     {savedProfiles.length === 0 ? (
                                         <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 text-center text-xs text-slate-400 italic relative z-10">
-                                            Belum ada draft tersimpan di browser ini.
+                                            Belum ada draft tersimpan.
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-52 overflow-y-auto pr-1 relative z-10">
@@ -892,6 +930,7 @@ function doPost(e) {
                                     </div>
                                 </div>
 
+                                {}
                                 {/* Administrasi */}
                                 <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
                                     <h3 className="text-base font-bold text-white border-b border-slate-800 pb-3 mb-5 flex items-center gap-2">
@@ -1095,8 +1134,8 @@ function doPost(e) {
 
                         <main className="flex-1 overflow-y-auto p-6 relative print:p-0 print:overflow-visible">
                             
-                            {/* --- PENGATURAN --- */}
                             {}
+                            {/* --- PENGATURAN --- */}
                             {activeTab === 'pengaturan' && (
                                 <div className="max-w-3xl mx-auto space-y-6">
                                     <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
@@ -1146,7 +1185,7 @@ function doPost(e) {
                                                             onClick={() => setShowScriptGuide(!showScriptGuide)}
                                                             className="text-indigo-400 hover:text-indigo-300 font-semibold normal-case flex items-center gap-1"
                                                         >
-                                                            <i className="ph ph-info"></i> Panduan Script
+                                                            <i className="ph ph-info"></i> Panduan Script Baru!
                                                         </button>
                                                     </label>
                                                     <input 
@@ -1156,14 +1195,14 @@ function doPost(e) {
                                                         className="w-full px-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white text-sm placeholder-slate-600 font-mono"
                                                         placeholder="https://script.google.com/macros/s/AKfycby.../exec"
                                                     />
-                                                    <p className="text-xs text-slate-400 mt-2">Agar aplikasi dapat mengirim dan menarik data dari Google Sheets, masukkan URL Web App dari Apps Script Anda di sini.</p>
+                                                    <p className="text-xs text-slate-400 mt-2">Agar fitur auto-sync dua arah berfungsi, pastikan Anda menggunakan versi script terbaru dari panduan ini.</p>
                                                 </div>
 
                                             </div>
 
                                             {showScriptGuide && (
                                                 <div className="mt-4 bg-slate-950 p-5 rounded-2xl border border-slate-700 relative">
-                                                    <h4 className="text-sm font-bold text-white mb-2">Panduan Pengaturan Google Sheets</h4>
+                                                    <h4 className="text-sm font-bold text-white mb-2">Panduan Script Auto-Sync Google Sheets</h4>
                                                     <ol className="list-decimal pl-5 text-xs text-slate-300 space-y-2 mb-4">
                                                         <li>Buka Google Sheets kosong.</li>
                                                         <li>Pilih Menu <b>Extensions (Ekstensi) &gt; Apps Script</b>.</li>
@@ -1318,7 +1357,6 @@ function doPost(e) {
                                 </div>
                             )}
 
-                            {}
                             {/* --- MODEL N2 --- */}
                             {activeTab === 'n2' && (
                                 <div className="a4-page print-only">
@@ -1389,7 +1427,6 @@ function doPost(e) {
                                 </div>
                             )}
 
-                            {}
                             {/* --- MODEL N3 --- */}
                             {activeTab === 'n3' && (
                                 <div className="a4-page print-only">
@@ -1447,7 +1484,6 @@ function doPost(e) {
                                 </div>
                             )}
 
-                             {}
                              {/* --- MODEL N4 --- */}
                              {activeTab === 'n4' && (
                                 <div className="a4-page print-only">
@@ -1514,7 +1550,6 @@ function doPost(e) {
                                 </div>
                             )}
 
-                             {}
                              {/* --- MODEL N5 --- */}
                              {activeTab === 'n5' && (
                                 <div className="a4-page print-only">
@@ -1613,107 +1648,115 @@ function doPost(e) {
                              {/* --- REKOMENDASI NIKAH --- */}
                              {activeTab === 'rekomendasi' && (
                                 <div className="a4-page print-only">
-                                    <div className="kop-surat flex items-center justify-between">
-                                        <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
-                                            {config.logoUrl && <img src={config.logoUrl} alt="Logo Desa" className="w-full h-full object-contain" />}
-                                        </div>
-                                        <div className="flex-1 text-center px-2">
-                                            <h3>PEMERINTAH KABUPATEN {data.kabupaten}</h3>
-                                            <h2>KECAMATAN {data.kecamatan}</h2>
-                                            <h1>DESA {data.desa}</h1>
-                                            <p>Alamat : Jl. Desa {data.desa} Kecamatan {data.kecamatan} Kabupaten {data.kabupaten} Kode Pos : {data.kodepos}</p>
-                                        </div>
-                                        <div className="w-20 h-20 flex-shrink-0"></div>
+                                    <div className="kop-surat">
+                                        <table className="w-full">
+                                            <tbody>
+                                                <tr>
+                                                    <td width="20%" className="align-middle text-center">
+                                                        {config.logoUrl ? (
+                                                            <img src={config.logoUrl} alt="Logo Desa" className="w-20 h-24 object-contain mx-auto" />
+                                                        ) : (
+                                                            <div className="w-20 h-24 border-2 border-black mx-auto flex items-center justify-center text-[12px] font-bold text-black">
+                                                                LOGO
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td width="60%" className="text-center align-middle">
+                                                        <h3>PEMERINTAH KABUPATEN {data.kabupaten}</h3>
+                                                        <h2>KECAMATAN {data.kecamatan}</h2>
+                                                        <h1>DESA {data.desa}</h1>
+                                                        <p>Alamat : Jln. Desa {data.desa} Kec. {data.kecamatan} Kab. {data.kabupaten} Kode Pos : {data.kodepos} <br/> Website: {data.desa.toLowerCase().replace(/\s+/g, '')}-{data.kabupaten.toLowerCase().replace(/\s+/g, '')}.desa.id</p>
+                                                    </td>
+                                                    <td width="20%"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
 
                                     <div>
-                                        <div className="flex justify-between mb-4">
-                                            <table className="w-2/3">
-                                                <tbody>
-                                                    <tr><td width="90">Nomor</td><td width="10">:</td><td>{data.nomorSurat}</td></tr>
-                                                    <tr><td>Sifat</td><td>:</td><td>Biasa</td></tr>
-                                                    <tr><td>Lampiran</td><td>:</td><td>1 (satu) berkas</td></tr>
-                                                    <tr><td className="align-top">Hal</td><td className="align-top">:</td><td><strong>Rekomendasi Nikah</strong></td></tr>
-                                                </tbody>
-                                            </table>
-                                            <div className="text-right">
-                                                {data.kecamatan}, {data.tanggalSurat}
-                                            </div>
-                                        </div>
+                                        <table className="w-full mt-4 mb-6">
+                                            <tbody>
+                                                <tr><td width="100">Nomor</td><td width="10">:</td><td>{data.nomorSurat}</td></tr>
+                                                <tr><td>Lampiran</td><td>:</td><td></td></tr>
+                                                <tr><td>Perihal</td><td>:</td><td className="font-bold uppercase">PERMOHONAN SURAT REKOMENDASI NIKAH</td></tr>
+                                            </tbody>
+                                        </table>
 
-                                        <div className="mb-4">
+                                        <div className="mb-6">
                                             <p>Kepada Yth,</p>
-                                            <p>Kepala KUA Kecamatan / PPN LN</p>
-                                            <p className="font-bold uppercase">{data.kuaTujuan}</p>
-                                            <p>di tempat</p>
+                                            <p>Kepala Kantor Urusan Agama</p>
+                                            <p>Kec. {data.kecamatan}</p>
+                                            <p>Di;-</p>
+                                            <p className="ml-4 capitalize">{data.kecamatan.toLowerCase()}</p>
                                         </div>
                                     </div>
 
-                                    <p className="mb-3 text-justify">Berdasarkan surat keterangan dari Kepala Desa/Kelurahan {data.desa} Nomor: {data.nomorSurat} Tanggal {data.tanggalSurat}, dengan ini menerangkan bahwa:</p>
+                                    <p className="mb-3 text-justify">Sehubungan dengan perihal di atas mohon surat Rekomendasi Nikah yang akan di gunakan oleh :</p>
                                     
-                                    <table className="w-full mb-3 ml-6">
-                                        <tbody>
-                                            <tr><td width="190" className="py-1">1. Nama</td><td width="10">:</td><td className="font-bold py-1">{pemohon.nama}</td></tr>
-                                            <tr><td className="py-1">2. {pemohon.binBintiLabel}</td><td>:</td><td className="py-1">{pemohon.binBintiName}</td></tr>
-                                            <tr><td className="py-1">3. Nomor Induk Kependudukan</td><td>:</td><td className="py-1">{pemohon.nik}</td></tr>
-                                            <tr><td className="py-1">4. Tempat, tanggal lahir</td><td>:</td><td className="py-1">{pemohon.tempatLahir}, {pemohon.tglLahir}</td></tr>
-                                            <tr><td className="py-1">5. Jenis Kelamin</td><td>:</td><td className="py-1">{pemohon.jk}</td></tr>
-                                            <tr><td className="py-1">6. Kewarganegaraan</td><td>:</td><td className="py-1">{pemohon.warga}</td></tr>
-                                            <tr><td className="py-1">7. Agama</td><td>:</td><td className="py-1">{pemohon.agama}</td></tr>
-                                            <tr><td className="py-1">8. Pekerjaan</td><td>:</td><td className="py-1">{pemohon.kerja}</td></tr>
-                                            <tr><td className="py-1 align-top">9. Alamat</td><td className="align-top">:</td><td className="py-1">{pemohon.alamat}</td></tr>
-                                            <tr><td className="py-1">10. Status Perkawinan</td><td>:</td><td className="py-1">{pemohon.status}</td></tr>
-                                        </tbody>
-                                    </table>
-
-                                    <p className="mb-2 text-justify">bermaksud akan melangsungkan perkawinan dengan seorang {pasangan.jk === 'LAKI-LAKI' ? 'laki-laki' : 'perempuan'}:</p>
-
                                     <table className="w-full mb-4 ml-6">
                                         <tbody>
-                                            <tr><td width="190" className="py-1">1. Nama</td><td width="10">:</td><td className="font-bold py-1">{pasangan.nama}</td></tr>
-                                            <tr><td className="py-1">2. {pasangan.binBintiLabel}</td><td>:</td><td className="py-1">{pasangan.binBintiName}</td></tr>
-                                            <tr><td className="py-1">3. Nomor Induk Kependudukan</td><td>:</td><td className="py-1">{pasangan.nik}</td></tr>
-                                            <tr><td className="py-1">4. Tempat, tanggal lahir</td><td>:</td><td className="py-1">{pasangan.tempatLahir}, {pasangan.tglLahir}</td></tr>
-                                            <tr><td className="py-1">5. Agama</td><td>:</td><td className="py-1">{pasangan.agama}</td></tr>
-                                            <tr><td className="py-1">6. Pekerjaan</td><td>:</td><td className="py-1">{pasangan.kerja}</td></tr>
-                                            <tr><td className="py-1 align-top">7. Alamat</td><td className="align-top">:</td><td className="py-1">{pasangan.alamat}</td></tr>
+                                            <tr><td width="190" className="py-1">Nama</td><td width="10">:</td><td className="font-bold py-1">{pemohon.nama}</td></tr>
+                                            <tr><td className="py-1">Nik</td><td>:</td><td className="py-1">{pemohon.nik}</td></tr>
+                                            <tr><td className="py-1">{pemohon.binBintiLabel}</td><td>:</td><td className="py-1">{pemohon.binBintiName}</td></tr>
+                                            <tr><td className="py-1">Tempat Tgl lahir</td><td>:</td><td className="py-1">{pemohon.tempatLahir}, {pemohon.tglLahir}</td></tr>
+                                            <tr><td className="py-1">Jenis kelamin</td><td>:</td><td className="py-1">{pemohon.jk}</td></tr>
+                                            <tr><td className="py-1">Kewarganegaraan</td><td>:</td><td className="py-1">{pemohon.warga}</td></tr>
+                                            <tr><td className="py-1">Agama</td><td>:</td><td className="py-1">{pemohon.agama}</td></tr>
+                                            <tr><td className="py-1">Setatus</td><td>:</td><td className="py-1">{pemohon.status}</td></tr>
+                                            <tr><td className="py-1">Pekerjaan</td><td>:</td><td className="py-1">{pemohon.kerja}</td></tr>
+                                            <tr><td className="py-1 align-top">Alamat</td><td className="align-top">:</td><td className="py-1 pr-6 leading-tight">{pemohon.alamat}</td></tr>
                                         </tbody>
                                     </table>
 
-                                    <p className="mb-4 text-justify">Berdasarkan persyaratan yang telah ditentukan dalam Undang-Undang Nomor 1 Tahun 1974 tentang Perkawinan jo. Undang-Undang Nomor 16 Tahun 2019, tidak terdapat halangan untuk melangsungkan perkawinan.</p>
-                                    <p className="mb-6 text-justify">Demikian surat rekomendasi ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
+                                    <p className="mb-2 text-justify">Akan melaksanakan Akad Nikah di :</p>
 
-                                    <div className="signature-container">
-                                        <div className="text-center w-64">
-                                            <p>Pemohon</p>
-                                            <br/><br/><br/>
-                                            <p className="font-bold underline">{pemohon.nama}</p>
-                                        </div>
-                                        <div className="text-center w-80">
-                                            <p>Kepala KUA Kecamatan {data.kecamatan}</p>
-                                            <br/><br/><br/>
-                                            <p className="font-bold uppercase">( ................................................... )</p>
-                                            <p>NIP. .........................................</p>
-                                        </div>
+                                    <table className="w-full mb-6 ml-6">
+                                        <tbody>
+                                            <tr><td width="190" className="py-1">Alamat Tempat Akad</td><td width="10">:</td><td className="py-1 pr-6">{data.tempatAkad}</td></tr>
+                                            <tr><td className="py-1">KUA Tujuan</td><td>:</td><td className="py-1">{data.kuaTujuan}</td></tr>
+                                            <tr><td className="py-1">Pada tanggal</td><td>:</td><td className="py-1">{data.waktuAkad}</td></tr>
+                                        </tbody>
+                                    </table>
+
+                                    <p className="mb-8 text-justify">Demikian permohonan ini di buat dengan sebenarnya atas terkabulnya kami mengucapkan terimakasih</p>
+
+                                    {/* Tanda tangan Kepala Desa di sebelah kanan, aman untuk print */}
+                                    <div className="mt-6" style={{ float: 'right', width: '16rem', textAlign: 'center' }}>
+                                        <p className="capitalize">{data.desa}, {data.tanggalSurat}</p>
+                                        <p className="capitalize">Kepala Desa {data.desa}</p>
+                                        <br/><br/><br/><br/>
+                                        <p className="font-bold underline uppercase">{data.kades}</p>
                                     </div>
+                                    <div style={{ clear: 'both' }}></div>
                                 </div>
                             )}
 
-                             {}
                              {/* --- NUMPANG NIKAH --- */}
                              {activeTab === 'numpang' && (
                                 <div className="a4-page print-only">
-                                    <div className="kop-surat flex items-center justify-between">
-                                        <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
-                                            {config.logoUrl && <img src={config.logoUrl} alt="Logo Desa" className="w-full h-full object-contain" />}
-                                        </div>
-                                        <div className="flex-1 text-center px-2">
-                                            <h3>PEMERINTAH KABUPATEN {data.kabupaten}</h3>
-                                            <h2>KECAMATAN {data.kecamatan}</h2>
-                                            <h1>DESA {data.desa}</h1>
-                                            <p>Alamat : Jl. Desa {data.desa} Kecamatan {data.kecamatan} Kabupaten {data.kabupaten} Kode Pos : {data.kodepos}</p>
-                                        </div>
-                                        <div className="w-20 h-20 flex-shrink-0"></div>
+                                    <div className="kop-surat">
+                                        <table className="w-full">
+                                            <tbody>
+                                                <tr>
+                                                    <td width="20%" className="align-middle text-center">
+                                                        {config.logoUrl ? (
+                                                            <img src={config.logoUrl} alt="Logo Desa" className="w-20 h-24 object-contain mx-auto" />
+                                                        ) : (
+                                                            <div className="w-20 h-24 border-2 border-black mx-auto flex items-center justify-center text-[12px] font-bold text-black">
+                                                                LOGO
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td width="60%" className="text-center align-middle">
+                                                        <h3>PEMERINTAH KABUPATEN {data.kabupaten}</h3>
+                                                        <h2>KECAMATAN {data.kecamatan}</h2>
+                                                        <h1>DESA {data.desa}</h1>
+                                                        <p>Alamat : Jl. Desa {data.desa} Kecamatan {data.kecamatan} Kabupaten {data.kabupaten} Kode Pos : {data.kodepos}</p>
+                                                    </td>
+                                                    <td width="20%"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
 
                                     <div>
@@ -1765,7 +1808,6 @@ function doPost(e) {
                                 </div>
                             )}
 
-                             {}
                              {/* --- KETERANGAN BELUM MENIKAH --- */}
                              {activeTab === 'belum_nikah' && (
                                 <div className="a4-page print-only">
