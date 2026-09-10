@@ -565,6 +565,13 @@ function doPost(e) {
                 }
             };
 
+            const handleRemoveLogo = () => {
+                const newConfig = { ...config, logoUrl: '' };
+                setConfig(newConfig);
+                localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
+                showNotification('Logo instansi berhasil dihapus.');
+            };
+
             const handleTtdUpload = (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -579,6 +586,13 @@ function doPost(e) {
                 }
             };
 
+            const handleRemoveTtd = () => {
+                const newConfig = { ...config, ttdUrl: '' };
+                setConfig(newConfig);
+                localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
+                showNotification('Tanda tangan berhasil dihapus.');
+            };
+
             const handleStempelUpload = (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -591,6 +605,13 @@ function doPost(e) {
                     };
                     reader.readAsDataURL(file);
                 }
+            };
+
+            const handleRemoveStempel = () => {
+                const newConfig = { ...config, stempelUrl: '' };
+                setConfig(newConfig);
+                localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
+                showNotification('Stempel berhasil dihapus.');
             };
 
             const handleRecovery = (e) => {
@@ -1356,8 +1377,17 @@ function doPost(e) {
                                                     type="file" 
                                                     accept="image/*"
                                                     onChange={handleLogoUpload}
-                                                    className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20"
+                                                    className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20 mb-2"
                                                 />
+                                                {config.logoUrl && (
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={handleRemoveLogo}
+                                                        className="w-full py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1"
+                                                    >
+                                                        <i className="ph ph-trash"></i> Hapus Logo
+                                                    </button>
+                                                )}
                                             </div>
 
                                             {/* Tanda Tangan */}
@@ -1376,7 +1406,7 @@ function doPost(e) {
                                                     onChange={handleTtdUpload}
                                                     className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20 mb-2"
                                                 />
-                                                <div className="w-full flex items-center justify-between text-[11px] text-slate-400">
+                                                <div className="w-full flex items-center justify-between text-[11px] text-slate-400 mb-2">
                                                     <span>Ukuran:</span>
                                                     <input 
                                                         type="number" 
@@ -1385,6 +1415,15 @@ function doPost(e) {
                                                         className="w-16 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white text-center text-xs"
                                                     /> px
                                                 </div>
+                                                {config.ttdUrl && (
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={handleRemoveTtd}
+                                                        className="w-full py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1"
+                                                    >
+                                                        <i className="ph ph-trash"></i> Hapus TTD
+                                                    </button>
+                                                )}
                                             </div>
 
                                             {/* Stempel */}
@@ -1403,7 +1442,7 @@ function doPost(e) {
                                                     onChange={handleStempelUpload}
                                                     className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20 mb-2"
                                                 />
-                                                <div className="w-full flex items-center justify-between text-[11px] text-slate-400">
+                                                <div className="w-full flex items-center justify-between text-[11px] text-slate-400 mb-2">
                                                     <span>Ukuran:</span>
                                                     <input 
                                                         type="number" 
@@ -1412,6 +1451,15 @@ function doPost(e) {
                                                         className="w-16 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white text-center text-xs"
                                                     /> px
                                                 </div>
+                                                {config.stempelUrl && (
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={handleRemoveStempel}
+                                                        className="w-full py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1"
+                                                    >
+                                                        <i className="ph ph-trash"></i> Hapus Stempel
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
 
