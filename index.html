@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Surat NA Premium 2026</title>
+    <title>Aplikasi Surat NA Premium 2026 - TTD & Stempel Otomatis</title>
     
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -81,7 +80,6 @@
                 margin: 0;
             }
             
-            /* Spasi dikompres maksimal untuk print */
             .mb-12 { margin-bottom: 0.5rem !important; }
             .mb-10 { margin-bottom: 0.4rem !important; }
             .mt-10 { margin-top: 0.4rem !important; }
@@ -165,7 +163,6 @@
             page-break-inside: avoid;
         }
 
-        /* Spinner Animation */
         .spinner {
             animation: spin 1s linear infinite;
         }
@@ -199,7 +196,6 @@
         );
 
         function App() {
-            // State untuk Autentikasi dan Navigasi
             const [isAuthenticated, setIsAuthenticated] = useState(false);
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
@@ -211,20 +207,21 @@
             const [notification, setNotification] = useState(null);
             const [savedProfiles, setSavedProfiles] = useState([]);
             
-            // State untuk Indikator Sinkronisasi Google Sheets
             const [isSyncing, setIsSyncing] = useState(false);
             const [showScriptGuide, setShowScriptGuide] = useState(false);
 
-            // State Konfigurasi Sistem
             const [config, setConfig] = useState({
                 username: 'NALAKILAKI',
                 password: 'NALAKILAKI',
                 email: '',
                 logoUrl: '',
-                googleSheetUrl: '' 
+                googleSheetUrl: '',
+                ttdUrl: '',      /* Tanda Tangan Kades */
+                stempelUrl: '',  /* Stempel Desa */
+                ttdWidth: 140,   /* Lebar TTD (px) */
+                stempelWidth: 90 /* Lebar Stempel (px) */
             });
             
-            // State Lupa Sandi & Pengaturan
             const [isForgotPass, setIsForgotPass] = useState(false);
             const [recoveryEmail, setRecoveryEmail] = useState('');
             const [resetStep, setResetStep] = useState(1);
@@ -233,10 +230,11 @@
                 username: '',
                 password: '',
                 email: '',
-                googleSheetUrl: ''
+                googleSheetUrl: '',
+                ttdWidth: 140,
+                stempelWidth: 90
             });
 
-            // Semua nilai form dikosongkan secara default agar bersih saat aplikasi dibuka
             const [data, setData] = useState({
                 jenisPemohon: 'L',
                 nomorSurat: '',
@@ -323,17 +321,17 @@
                 }
 
                 const savedConfig = localStorage.getItem('sim_na_config');
-                let loadedConfig = config;
                 if (savedConfig) {
                     try {
                         const parsed = JSON.parse(savedConfig);
                         setConfig(parsed);
-                        loadedConfig = parsed;
                         setSettingsData({
                             username: parsed.username,
                             password: parsed.password,
                             email: parsed.email || '',
-                            googleSheetUrl: parsed.googleSheetUrl || ''
+                            googleSheetUrl: parsed.googleSheetUrl || '',
+                            ttdWidth: parsed.ttdWidth || 140,
+                            stempelWidth: parsed.stempelWidth || 90
                         });
                     } catch (e) {
                         console.error("Gagal memuat config", e);
@@ -343,12 +341,13 @@
                         username: 'NALAKILAKI',
                         password: 'NALAKILAKI',
                         email: '',
-                        googleSheetUrl: ''
+                        googleSheetUrl: '',
+                        ttdWidth: 140,
+                        stempelWidth: 90
                     });
                 }
             }, []);
             
-            // Auto-fetch data when logged in
             useEffect(() => {
                 if (isLoggedIn && config.googleSheetUrl) {
                     fetchFromGoogleSheet(config.googleSheetUrl, false);
@@ -390,12 +389,10 @@
                     const response = await fetch(`${url}?action=get_all`);
                     const result = await response.json();
                     if (result && result.status === 'success') {
-                        // Memperbarui daftar riwayat dari sheet dan menyaring format tanggal
                         const incomingData = Array.isArray(result.data) ? result.data.map(profile => {
                             const sanitizedData = {};
                             for (const key in profile.data) {
                                 let val = profile.data[key];
-                                // Mencegah format tanggal rusak (ISO string) jika Sheet mengkonversi otomatis
                                 if (typeof val === 'string' && val.includes('T') && val.includes('Z') && val.length >= 20) {
                                     const d = new Date(val);
                                     if(!isNaN(d.getTime())) {
@@ -426,12 +423,10 @@
                     label: `${data.suamiNama || 'Suami'} & ${data.istriNama || 'Istri'} (${data.jenisPemohon === 'L' ? 'Laki-laki' : 'Perempuan'})`,
                     data: { ...data }
                 };
-                const updatedProfiles = [newProfile, ...savedProfiles].slice(0, 50); // Maks 50 draft
+                const updatedProfiles = [newProfile, ...savedProfiles].slice(0, 50);
                 setSavedProfiles(updatedProfiles);
                 localStorage.setItem('sim_na_premium_saved', JSON.stringify(updatedProfiles));
                 showNotification('Draft berhasil disimpan ke lokal & tersinkronisasi ke Cloud!');
-                
-                // Auto trigger sync
                 syncAllToSheet(updatedProfiles);
             };
 
@@ -445,8 +440,6 @@
                 setSavedProfiles(updated);
                 localStorage.setItem('sim_na_premium_saved', JSON.stringify(updated));
                 showNotification('Draft berhasil dihapus dari sistem & Cloud.', 'error');
-                
-                // Auto trigger sync delete
                 syncAllToSheet(updated);
             };
 
@@ -463,15 +456,22 @@
 
             const saveConfig = (e) => {
                 e.preventDefault();
-                const newConfig = { ...config, ...settingsData };
+                const newConfig = { 
+                    ...config, 
+                    username: settingsData.username,
+                    password: settingsData.password,
+                    email: settingsData.email,
+                    googleSheetUrl: settingsData.googleSheetUrl,
+                    ttdWidth: Number(settingsData.ttdWidth) || 140,
+                    stempelWidth: Number(settingsData.stempelWidth) || 90
+                };
                 setConfig(newConfig);
                 localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
-                showNotification('Pengaturan berhasil disimpan!');
+                showNotification('Pengaturan sistem berhasil disimpan!');
             };
 
             const getGoogleScriptTemplate = () => {
                 return `function doGet(e) {
-  // Menangani fungsi Tarik Data (Fetch/Refresh)
   if (e.parameter.action === 'get_all') {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var lastRow = sheet.getLastRow();
@@ -483,7 +483,6 @@
     }
 
     var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-    // getDisplayValues agar teks dan tanggal tidak diubah sistem
     var dataRange = sheet.getRange(2, 1, lastRow - 1, lastCol).getDisplayValues(); 
 
     var profiles = [];
@@ -508,14 +507,13 @@
 }
 
 function doPost(e) {
-  // Menangani fungsi Simpan dan Hapus Massal (Auto-Sync)
   var parsedData = JSON.parse(e.postData.contents);
   
   if (parsedData.action === 'sync_all') {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var profiles = parsedData.profiles;
 
-    sheet.clear(); // Bersihkan agar jika ada data dihapus, benar-benar hilang di sheet
+    sheet.clear();
 
     if (!profiles || profiles.length === 0) {
         return ContentService.createTextOutput(JSON.stringify({status: "success"}))
@@ -535,7 +533,6 @@ function doPost(e) {
         
         for (var j = 0; j < dataHeaders.length; j++) {
             var cellValue = p.data[dataHeaders[j]] || "";
-            // Tanda kutip memaksa text murni untuk NIK dan Tanggal
             if (typeof cellValue === 'string') {
                 cellValue = "'" + cellValue;
             }
@@ -563,6 +560,34 @@ function doPost(e) {
                         setConfig(newConfig);
                         localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
                         showNotification('Logo berhasil diperbarui!');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const handleTtdUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const newConfig = { ...config, ttdUrl: reader.result };
+                        setConfig(newConfig);
+                        localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
+                        showNotification('Scan tanda tangan kades berhasil dimuat!');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const handleStempelUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const newConfig = { ...config, stempelUrl: reader.result };
+                        setConfig(newConfig);
+                        localStorage.setItem('sim_na_config', JSON.stringify(newConfig));
+                        showNotification('Scan stempel desa berhasil dimuat!');
                     };
                     reader.readAsDataURL(file);
                 }
@@ -695,6 +720,57 @@ function doPost(e) {
                 alamat: isMale ? data.ibuSuamiAlamat : data.ibuIstriAlamat,
             };
 
+            const renderKadesSignatureBlock = (titleText = "Kepala Desa/Kelurahan") => {
+                const hasTtd = !!config.ttdUrl;
+                const hasStempel = !!config.stempelUrl;
+
+                return (
+                    <div className="text-center" style={{ width: '18rem', position: 'relative', margin: '0 auto' }}>
+                        <p>{titleText}</p>
+                        
+                        {/* Area Tanda Tangan & Stempel Otomatis */}
+                        <div style={{ position: 'relative', height: '95px', margin: '4px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {hasStempel && (
+                                <img 
+                                    src={config.stempelUrl} 
+                                    alt="Stempel Desa" 
+                                    style={{ 
+                                        position: 'absolute', 
+                                        left: '22%', 
+                                        top: '50%', 
+                                        transform: 'translate(-50%, -50%)', 
+                                        width: `${config.stempelWidth || 90}px`, 
+                                        height: 'auto', 
+                                        mixBlendMode: 'multiply', 
+                                        opacity: 0.9,
+                                        zIndex: 1,
+                                        pointerEvents: 'none' 
+                                    }} 
+                                />
+                            )}
+                            {hasTtd && (
+                                <img 
+                                    src={config.ttdUrl} 
+                                    alt="Tanda Tangan Kades" 
+                                    style={{ 
+                                        position: 'relative', 
+                                        width: `${config.ttdWidth || 140}px`, 
+                                        height: 'auto', 
+                                        zIndex: 2,
+                                        mixBlendMode: 'darken' 
+                                    }} 
+                                />
+                            )}
+                            {!hasTtd && !hasStempel && (
+                                <div style={{ height: '70px' }}></div>
+                            )}
+                        </div>
+
+                        <p className="font-bold underline uppercase" style={{ position: 'relative', zIndex: 3 }}>{data.kades || '........................................'}</p>
+                    </div>
+                );
+            };
+
             if (!isAuthenticated) {
                 return (
                     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-slate-950">
@@ -713,7 +789,7 @@ function doPost(e) {
                             <div className="text-center mt-6 mb-8">
                                 <span className="inline-block px-3 py-1 bg-indigo-500/10 text-indigo-400 text-xs font-semibold rounded-full mb-2 tracking-wide uppercase border border-indigo-500/20">Secure Portal</span>
                                 <h1 className="text-2xl font-black text-white tracking-tight">SIM NA PREMIUM 2026</h1>
-                                <p className="text-slate-400 text-sm mt-1">Sistem Administrasi Nikah + GSheet Sync</p>
+                                <p className="text-slate-400 text-sm mt-1">Sistem Administrasi Nikah + TTD & Stempel Otomatis</p>
                             </div>
                             
                             {!isForgotPass ? (
@@ -860,11 +936,10 @@ function doPost(e) {
                                     <i className="ph ph-file-dashed text-4xl"></i>
                                 </div>
                                 <h1 className="text-3xl font-black tracking-tight text-white">Dashboard Input Data Surat NA</h1>
-                                <p className="text-slate-400 text-sm mt-1 max-w-xl mx-auto">Kelola data pemohon secara lokal maupun tersinkronisasi dengan Google Sheets untuk pembuatan dokumen instan.</p>
+                                <p className="text-slate-400 text-sm mt-1 max-w-xl mx-auto">Kelola data pemohon dan integrasi TTD/Stempel otomatis untuk pembuatan dokumen instan.</p>
                             </div>
 
                             <div className="space-y-6">
-                                {/* Integrasi Google Sheets Panel */}
                                 <div className="bg-gradient-to-br from-emerald-900/40 to-slate-900/90 backdrop-blur-md border border-emerald-800/50 p-6 rounded-3xl shadow-xl relative overflow-hidden">
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
                                         <div>
@@ -885,12 +960,11 @@ function doPost(e) {
                                     </div>
                                     {!config.googleSheetUrl && (
                                         <div className="mt-3 text-xs text-red-400 flex items-center gap-2">
-                                            <i className="ph ph-warning-circle"></i> URL Google Apps Script belum disetel. Buka menu <b>Pengaturan Sistem</b> (di halaman dokumen) untuk menyetelnya.
+                                            <i className="ph ph-warning-circle"></i> URL Google Apps Script belum disetel. Buka menu <b>Pengaturan Sistem</b> untuk menyetelnya.
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Saved Draft Manager Lokal */}
                                 <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-6 rounded-3xl shadow-xl relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/5 rounded-bl-full pointer-events-none"></div>
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 relative z-10">
@@ -931,7 +1005,6 @@ function doPost(e) {
                                     )}
                                 </div>
 
-                                {/* Toggle Jenis Pemohon */}
                                 <div className="bg-slate-900/90 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-slate-800 text-center">
                                     <h3 className="text-sm font-bold text-white mb-3">Pilih Pihak Pemohon Utama (Warga Desa Ini)</h3>
                                     <div className="flex justify-center gap-4">
@@ -950,7 +1023,6 @@ function doPost(e) {
                                     </div>
                                 </div>
 
-                                {/* Administrasi */}
                                 <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
                                     <h3 className="text-base font-bold text-white border-b border-slate-800 pb-3 mb-5 flex items-center gap-2">
                                         <i className="ph ph-map-pin text-indigo-400"></i> Data Administrasi & KUA Tujuan
@@ -970,8 +1042,6 @@ function doPost(e) {
                                     </div>
                                 </div>
 
-                                {}
-                                {/* Calon Suami */}
                                 <div className={`bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800 border-l-4 ${data.jenisPemohon === 'L' ? 'border-l-indigo-500' : 'border-l-slate-700'}`}>
                                     <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-5">
                                         <h3 className="text-base font-bold text-white flex items-center gap-2">
@@ -1027,8 +1097,6 @@ function doPost(e) {
                                     )}
                                 </div>
 
-                                {}
-                                {/* Calon Istri */}
                                 <div className={`bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800 border-l-4 ${data.jenisPemohon === 'P' ? 'border-l-pink-500' : 'border-l-slate-700'}`}>
                                     <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-5">
                                         <h3 className="text-base font-bold text-white flex items-center gap-2">
@@ -1084,7 +1152,6 @@ function doPost(e) {
                                     )}
                                 </div>
 
-                                {/* Proceed Button */}
                                 <div className="text-center pb-20 pt-4">
                                     <button 
                                         onClick={enterDocumentDashboard} 
@@ -1107,7 +1174,6 @@ function doPost(e) {
 
             return (
                 <div className="flex h-screen overflow-hidden bg-slate-950 text-slate-100">
-                    {/* Sidebar navigation */}
                     <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col no-print z-20">
                         <div className="p-6 text-center border-b border-slate-800 bg-slate-950/50">
                             <div className="inline-flex w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-xl mb-3 border border-indigo-500/20 items-center justify-center overflow-hidden shadow-inner">
@@ -1143,7 +1209,6 @@ function doPost(e) {
                         </div>
                     </div>
 
-                    {/* Main workspace */}
                     <div className="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
                         <header className="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-6 no-print z-10 shrink-0">
                             <div className="flex items-center gap-3">
@@ -1167,7 +1232,6 @@ function doPost(e) {
 
                         <main className="flex-1 overflow-y-auto p-6 relative print:p-0 print:overflow-visible">
                             
-                            {/* --- PENGATURAN --- */}
                             {activeTab === 'pengaturan' && (
                                 <div className="max-w-3xl mx-auto space-y-6">
                                     <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
@@ -1208,7 +1272,6 @@ function doPost(e) {
                                                     />
                                                 </div>
                                                 
-                                                {/* Input GSheet */}
                                                 <div className="md:col-span-2 bg-emerald-900/20 p-5 rounded-2xl border border-emerald-500/20">
                                                     <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center justify-between">
                                                         <span>URL Web App Google Apps Script (Untuk GSheet)</span>
@@ -1242,7 +1305,7 @@ function doPost(e) {
                                                         <li>Simpan proyek (Ctrl+S).</li>
                                                         <li>Klik <b>Deploy (Terapkan) &gt; New Deployment (Penerapan Baru)</b>.</li>
                                                         <li>Pilih tipe <b>Web App</b>. Akses (Who has access) ubah menjadi <b>"Anyone" (Siapa Saja)</b>.</li>
-                                                        <li>Klik <b>Deploy</b> (mungkin akan meminta otorisasi akun Google Anda).</li>
+                                                        <li>Klik <b>Deploy</b>.</li>
                                                         <li><b>Copy URL Web App</b> yang dihasilkan dan paste pada kolom URL di atas, lalu klik <b>Simpan</b>.</li>
                                                     </ol>
                                                     
@@ -1272,30 +1335,89 @@ function doPost(e) {
                                         </form>
                                     </div>
 
+                                    {/* --- PENGATURAN ASSET: LOGO, TTD & STEMPEL --- */}
                                     <div className="bg-slate-900/90 backdrop-blur-md p-7 rounded-3xl shadow-xl border border-slate-800">
                                         <h3 className="text-lg font-black text-white border-b border-slate-800 pb-4 mb-6 flex items-center gap-3">
-                                            <i className="ph ph-image text-emerald-400 text-2xl"></i> Pengaturan Logo Aplikasi
+                                            <i className="ph ph-stamp text-emerald-400 text-2xl"></i> Pengaturan Logo, TTD & Stempel Otomatis
                                         </h3>
                                         
-                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                                            <div className="w-24 h-24 rounded-2xl bg-slate-800 flex items-center justify-center border border-slate-700 overflow-hidden shrink-0">
-                                                {config.logoUrl ? (
-                                                    <img src={config.logoUrl} alt="Logo" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <i className="ph ph-image text-3xl text-slate-500"></i>
-                                                )}
-                                            </div>
-                                            <div className="flex-1 w-full">
-                                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Unggah Logo Baru</label>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                            {/* Logo */}
+                                            <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60 flex flex-col items-center text-center">
+                                                <div className="w-20 h-24 rounded-xl bg-slate-900 flex items-center justify-center border border-slate-700 overflow-hidden mb-3">
+                                                    {config.logoUrl ? (
+                                                        <img src={config.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                                                    ) : (
+                                                        <i className="ph ph-image text-2xl text-slate-500"></i>
+                                                    )}
+                                                </div>
+                                                <label className="block text-xs font-bold text-slate-300 mb-1">Logo Instansi</label>
                                                 <input 
                                                     type="file" 
                                                     accept="image/*"
                                                     onChange={handleLogoUpload}
-                                                    className="w-full px-4 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20"
+                                                    className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20"
                                                 />
-                                                <p className="text-xs text-slate-500 mt-2">Gunakan format gambar JPG atau PNG. Rekomendasi rasio 1:1 (persegi).</p>
+                                            </div>
+
+                                            {/* Tanda Tangan */}
+                                            <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60 flex flex-col items-center text-center">
+                                                <div className="w-24 h-20 rounded-xl bg-slate-900 flex items-center justify-center border border-slate-700 overflow-hidden mb-3 relative">
+                                                    {config.ttdUrl ? (
+                                                        <img src={config.ttdUrl} alt="TTD" className="max-w-full max-h-full object-contain filter darken" />
+                                                    ) : (
+                                                        <i className="ph ph-signature text-2xl text-slate-500"></i>
+                                                    )}
+                                                </div>
+                                                <label className="block text-xs font-bold text-slate-300 mb-1">Scan Tanda Tangan Kades</label>
+                                                <input 
+                                                    type="file" 
+                                                    accept="image/*"
+                                                    onChange={handleTtdUpload}
+                                                    className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20 mb-2"
+                                                />
+                                                <div className="w-full flex items-center justify-between text-[11px] text-slate-400">
+                                                    <span>Ukuran:</span>
+                                                    <input 
+                                                        type="number" 
+                                                        value={settingsData.ttdWidth} 
+                                                        onChange={e => setSettingsData({...settingsData, ttdWidth: e.target.value})}
+                                                        className="w-16 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white text-center text-xs"
+                                                    /> px
+                                                </div>
+                                            </div>
+
+                                            {/* Stempel */}
+                                            <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60 flex flex-col items-center text-center">
+                                                <div className="w-24 h-20 rounded-xl bg-slate-900 flex items-center justify-center border border-slate-700 overflow-hidden mb-3 relative">
+                                                    {config.stempelUrl ? (
+                                                        <img src={config.stempelUrl} alt="Stempel" className="max-w-full max-h-full object-contain" />
+                                                    ) : (
+                                                        <i className="ph ph-stamp text-2xl text-slate-500"></i>
+                                                    )}
+                                                </div>
+                                                <label className="block text-xs font-bold text-slate-300 mb-1">Scan Stempel Desa</label>
+                                                <input 
+                                                    type="file" 
+                                                    accept="image/*"
+                                                    onChange={handleStempelUpload}
+                                                    className="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20 mb-2"
+                                                />
+                                                <div className="w-full flex items-center justify-between text-[11px] text-slate-400">
+                                                    <span>Ukuran:</span>
+                                                    <input 
+                                                        type="number" 
+                                                        value={settingsData.stempelWidth} 
+                                                        onChange={e => setSettingsData({...settingsData, stempelWidth: e.target.value})}
+                                                        className="w-16 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white text-center text-xs"
+                                                    /> px
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <button onClick={saveConfig} className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition-all">
+                                            <i className="ph ph-check text-base"></i> Terapkan Perubahan Ukuran TTD & Stempel
+                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -1378,11 +1500,9 @@ function doPost(e) {
                                             <br/><br/><br/>
                                             <p className="font-bold underline">{pemohon.nama}</p>
                                         </div>
-                                        <div className="text-center w-64">
-                                            <p>{data.desa}, {data.tanggalSurat}</p>
-                                            <p>Kepala Desa/Kelurahan</p>
-                                            <br/><br/><br/>
-                                            <p className="font-bold underline">{data.kades}</p>
+                                        <div>
+                                            <p className="text-center mb-1">{data.desa}, {data.tanggalSurat}</p>
+                                            {renderKadesSignatureBlock("Kepala Desa/Kelurahan")}
                                         </div>
                                     </div>
                                 </div>
@@ -1750,12 +1870,9 @@ function doPost(e) {
 
                                     <p className="mb-8 text-justify">Demikian permohonan ini di buat dengan sebenarnya atas terkabulnya kami mengucapkan terimakasih</p>
 
-                                    {/* Tanda tangan Kepala Desa di sebelah kanan, aman untuk print */}
-                                    <div className="mt-6" style={{ float: 'right', width: '16rem', textAlign: 'center' }}>
-                                        <p className="capitalize">{data.desa}, {data.tanggalSurat}</p>
-                                        <p className="capitalize">Kepala Desa {data.desa}</p>
-                                        <br/><br/><br/><br/>
-                                        <p className="font-bold underline uppercase">{data.kades}</p>
+                                    <div className="mt-6" style={{ float: 'right', width: '18rem' }}>
+                                        <p className="text-center capitalize mb-1">{data.desa}, {data.tanggalSurat}</p>
+                                        {renderKadesSignatureBlock(`Kepala Desa ${data.desa}`)}
                                     </div>
                                     <div style={{ clear: 'both' }}></div>
                                 </div>
@@ -1828,11 +1945,9 @@ function doPost(e) {
                                             <br/><br/><br/>
                                             <p className="font-bold underline">{pemohon.nama}</p>
                                         </div>
-                                        <div className="text-center w-64">
-                                            <p>{data.desa}, {data.tanggalSurat}</p>
-                                            <p>Kepala Desa {data.desa}</p>
-                                            <br/><br/><br/>
-                                            <p className="font-bold underline">{data.kades}</p>
+                                        <div>
+                                            <p className="text-center mb-1">{data.desa}, {data.tanggalSurat}</p>
+                                            {renderKadesSignatureBlock(`Kepala Desa ${data.desa}`)}
                                         </div>
                                     </div>
                                 </div>
@@ -1883,11 +1998,9 @@ function doPost(e) {
                                     </table>
 
                                     <div className="signature-container">
-                                        <div className="text-center w-64">
-                                            <p>Mengetahui,</p>
-                                            <p>Kepala Desa/Kelurahan</p>
-                                            <br/><br/><br/>
-                                            <p className="font-bold underline">{data.kades}</p>
+                                        <div>
+                                            <p className="text-center mb-1">Mengetahui,</p>
+                                            {renderKadesSignatureBlock("Kepala Desa/Kelurahan")}
                                         </div>
                                         <div className="text-center w-64">
                                             <p>{data.desa}, {data.tanggalSurat}</p>
