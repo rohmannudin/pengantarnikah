@@ -196,6 +196,25 @@
         );
 
         function App() {
+            // === PENGATURAN URL PERMANEN (HARDCODE) ===
+            // Paste URL Google Apps Script Anda di dalam tanda kutip di bawah ini
+            const PERMANENT_GSHEET_URL = "https://script.google.com/macros/s/AKfycbySTp2OdRP6fG3vC4mFHcKQyKMJYbfi5FrdhdA_rSodrk0ycjUmJDKKkjmggWtazPNssQ/exec"; 
+            
+            // Opsional: Anda juga bisa memasukkan URL gambar langsung di sini agar permanen
+            const PERMANENT_LOGO_URL = ""; 
+            const PERMANENT_TTD_URL = ""; 
+            const PERMANENT_STEMPEL_URL = ""; 
+            // ==========================================
+
+            const isValidUrl = (url) => {
+                try {
+                    new URL(url);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            };
+
             const [isAuthenticated, setIsAuthenticated] = useState(false);
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
@@ -214,10 +233,10 @@
                 username: 'NALAKILAKI',
                 password: 'NALAKILAKI',
                 email: '',
-                logoUrl: '',
-                googleSheetUrl: '',
-                ttdUrl: '',      /* Tanda Tangan Kades */
-                stempelUrl: '',  /* Stempel Desa */
+                logoUrl: PERMANENT_LOGO_URL,
+                googleSheetUrl: PERMANENT_GSHEET_URL,
+                ttdUrl: PERMANENT_TTD_URL,      /* Tanda Tangan Kades */
+                stempelUrl: PERMANENT_STEMPEL_URL,  /* Stempel Desa */
                 ttdWidth: 140,   /* Lebar TTD (px) */
                 stempelWidth: 90 /* Lebar Stempel (px) */
             });
@@ -311,45 +330,7 @@
             });
 
             useEffect(() => {
-                const saved = localStorage.getItem('sim_na_premium_saved');
-                if (saved) {
-                    try {
-                        setSavedProfiles(JSON.parse(saved));
-                    } catch (e) {
-                        console.error("Gagal memuat data", e);
-                    }
-                }
-
-                const savedConfig = localStorage.getItem('sim_na_config');
-                if (savedConfig) {
-                    try {
-                        const parsed = JSON.parse(savedConfig);
-                        setConfig(parsed);
-                        setSettingsData({
-                            username: parsed.username,
-                            password: parsed.password,
-                            email: parsed.email || '',
-                            googleSheetUrl: parsed.googleSheetUrl || '',
-                            ttdWidth: parsed.ttdWidth || 140,
-                            stempelWidth: parsed.stempelWidth || 90
-                        });
-                    } catch (e) {
-                        console.error("Gagal memuat config", e);
-                    }
-                } else {
-                    setSettingsData({
-                        username: 'NALAKILAKI',
-                        password: 'NALAKILAKI',
-                        email: '',
-                        googleSheetUrl: '',
-                        ttdWidth: 140,
-                        stempelWidth: 90
-                    });
-                }
-            }, []);
-            
-            useEffect(() => {
-                if (isLoggedIn && config.googleSheetUrl) {
+                if (isLoggedIn && config.googleSheetUrl && isValidUrl(config.googleSheetUrl) && config.googleSheetUrl !== "ISI_URL_GOOGLE_SHEET_ANDA_DISINI") {
                     fetchFromGoogleSheet(config.googleSheetUrl, false);
                 }
             }, [isLoggedIn, config.googleSheetUrl]);
@@ -360,7 +341,7 @@
             };
 
             const syncAllToSheet = async (profilesData, url = config.googleSheetUrl) => {
-                if (!url) return;
+                if (!url || !isValidUrl(url) || url === "ISI_URL_GOOGLE_SHEET_ANDA_DISINI") return;
                 setIsSyncing(true);
                 try {
                     const response = await fetch(url, {
@@ -380,8 +361,8 @@
             };
 
             const fetchFromGoogleSheet = async (url = config.googleSheetUrl, showMsg = true) => {
-                if (!url) {
-                    if(showMsg) showNotification("URL Google Sheet belum diatur!", "error");
+                if (!url || !isValidUrl(url) || url === "ISI_URL_GOOGLE_SHEET_ANDA_DISINI") {
+                    if(showMsg) showNotification("URL Google Sheet belum diatur dengan benar!", "error");
                     return;
                 }
                 setIsSyncing(true);
@@ -1543,11 +1524,7 @@ function doPost(e) {
                                     <p className="mb-10 text-justify">Demikian surat pengantar ini dibuat dengan mengingat sumpah jabatan dan untuk dipergunakan sebagaimana mestinya.</p>
 
                                     <div className="signature-container">
-                                        <div className="text-center w-64">
-                                            <p>Pemohon</p>
-                                            <br/><br/><br/>
-                                            <p className="font-bold underline">{pemohon.nama}</p>
-                                        </div>
+                                        <div></div>
                                         <div>
                                             <p className="text-center mb-1">{data.desa}, {data.tanggalSurat}</p>
                                             {renderKadesSignatureBlock("Kepala Desa/Kelurahan")}
@@ -1988,11 +1965,7 @@ function doPost(e) {
                                     <p className="mb-6 text-justify">Demikian Surat Keterangan Numpang Nikah ini kami buat agar dapat dipergunakan seperlunya.</p>
 
                                     <div className="signature-container">
-                                        <div className="text-center w-64">
-                                            <p>Pemohon</p>
-                                            <br/><br/><br/>
-                                            <p className="font-bold underline">{pemohon.nama}</p>
-                                        </div>
+                                        <div></div>
                                         <div>
                                             <p className="text-center mb-1">{data.desa}, {data.tanggalSurat}</p>
                                             {renderKadesSignatureBlock(`Kepala Desa ${data.desa}`)}
