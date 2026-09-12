@@ -325,7 +325,7 @@
             const [isSyncing, setIsSyncing] = useState(false);
             const [showScriptGuide, setShowScriptGuide] = useState(false);
 
-            const [config, setConfig] = useState({
+            const DEFAULT_CONFIG = {
                 username: 'NALAKILAKI',
                 password: 'NALAKILAKI',
                 email: '',
@@ -337,20 +337,47 @@
                 stempelWidth: 90, /* Lebar Stempel (px) */
                 ttdOffset: { x: 0, y: 0 },
                 stempelOffset: { x: 0, y: 0 }
+            };
+
+            // Load pengaturan dari localStorage (permanen) atau gunakan pengaturan standar
+            const [config, setConfig] = useState(() => {
+                const savedConfig = localStorage.getItem('sim_na_config');
+                if (savedConfig) {
+                    try {
+                        return { ...DEFAULT_CONFIG, ...JSON.parse(savedConfig) };
+                    } catch (e) {
+                        return DEFAULT_CONFIG;
+                    }
+                }
+                return DEFAULT_CONFIG;
             });
             
             const [isForgotPass, setIsForgotPass] = useState(false);
             const [recoveryEmail, setRecoveryEmail] = useState('');
             const [resetStep, setResetStep] = useState(1);
             const [newPass, setNewPass] = useState('');
+            
+            // Sinkronisasi data form pengaturan dengan config yang sedang aktif
             const [settingsData, setSettingsData] = useState({
-                username: '',
-                password: '',
-                email: '',
-                googleSheetUrl: '',
-                ttdWidth: 140,
-                stempelWidth: 90
+                username: config.username,
+                password: config.password,
+                email: config.email,
+                googleSheetUrl: config.googleSheetUrl,
+                ttdWidth: config.ttdWidth,
+                stempelWidth: config.stempelWidth
             });
+
+            // Update form input pengaturan otomatis jika config berubah
+            useEffect(() => {
+                setSettingsData({
+                    username: config.username,
+                    password: config.password,
+                    email: config.email,
+                    googleSheetUrl: config.googleSheetUrl,
+                    ttdWidth: config.ttdWidth,
+                    stempelWidth: config.stempelWidth
+                });
+            }, [config]);
 
             const [data, setData] = useState({
                 jenisPemohon: 'L',
