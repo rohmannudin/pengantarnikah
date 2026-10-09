@@ -383,6 +383,7 @@
                 jenisPemohon: 'L',
                 nomorSurat: '',
                 tanggalSurat: '',
+                tanggalRekomendasi: '',
                 kades: '',
                 kabupaten: '',
                 kecamatan: '',
@@ -826,8 +827,8 @@ function doPost(e) {
                 jk: isMale ? 'PEREMPUAN' : 'LAKI-LAKI',
                 tempatLahir: isMale ? data.istriTempatLahir : data.suamiTempatLahir,
                 tglLahir: isMale ? data.istriTglLahir : data.suamiTglLahir,
-                warga: isMale ? data.istriWarga : data.suamiWarga,
-                agama: isMale ? data.istriAgama : data.suamiAgama,
+                warga: isMale ? data.istriWarga : data.istriAgama,
+                agama: isMale ? data.istriAgama : data.istriAgama,
                 kerja: isMale ? data.istriKerja : data.suamiKerja,
                 alamat: isMale ? data.istriAlamat : data.suamiAlamat,
                 status: isMale ? data.istriStatus : data.suamiStatus,
@@ -1166,9 +1167,10 @@ function doPost(e) {
                                         <InputField label="Kabupaten" name="kabupaten" value={data.kabupaten} onChange={handleChange} icon="ph-globe" />
                                         <InputField label="Waktu Akad" name="waktuAkad" value={data.waktuAkad} onChange={handleChange} icon="ph-clock" />
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
                                         <InputField label="Tempat Pelaksanaan Akad Nikah" name="tempatAkad" value={data.tempatAkad} onChange={handleChange} icon="ph-map-pin" />
                                         <InputField label="KUA Tujuan (Rekomendasi)" name="kuaTujuan" value={data.kuaTujuan} onChange={handleChange} placeholder="KEC. MAOS KAB. CILACAP" icon="ph-bank" />
+                                        <InputField label="Tanggal Surat Rekomendasi" name="tanggalRekomendasi" value={data.tanggalRekomendasi} onChange={handleChange} placeholder="Kosongkan jika ingin tanggal kosong" icon="ph-calendar" />
                                     </div>
                                 </div>
 
@@ -2024,14 +2026,16 @@ function doPost(e) {
                                         <tbody>
                                             <tr><td width="190" className="py-1">Alamat Tempat Akad</td><td width="10">:</td><td className="py-1 pr-6">{data.tempatAkad}</td></tr>
                                             <tr><td className="py-1">KUA Tujuan</td><td>:</td><td className="py-1">{data.kuaTujuan}</td></tr>
-                                            <tr><td className="py-1">Pada tanggal</td><td>:</td><td className="py-1">{data.waktuAkad}</td></tr>
+                                            <tr><td className="py-1">Pada tanggal</td><td>:</td><td className="py-1">{data.tanggalRekomendasi}</td></tr>
                                         </tbody>
                                     </table>
 
                                     <p className="mb-8 text-justify">Demikian permohonan ini di buat dengan sebenarnya atas terkabulnya kami mengucapkan terimakasih</p>
 
                                     <div className="mt-6" style={{ float: 'right', width: '18rem' }}>
-                                        <p className="text-center capitalize mb-1">{data.desa}, {data.tanggalSurat}</p>
+                                        <p className="text-center mb-1">
+                                            {data.desa}, {data.tanggalSurat}
+                                        </p>
                                         {renderKadesSignatureBlock(`Kepala Desa ${data.desa}`)}
                                     </div>
                                     <div style={{ clear: 'both' }}></div>
@@ -2180,3 +2184,5 @@ function doPost(e) {
     </script>
 </body>
 </html>
+APLIKASI BERSUMBER DARI DESA FAJAR ASRI JIKA TERJADI COPY PASTE AKAN SEGERA DI LAPORKAN "PEMBUAT APLIKASI"ROHMAN NUDIN SELAKU SEKDES FAJAR ASRI"
+```eof
